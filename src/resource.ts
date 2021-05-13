@@ -23,6 +23,7 @@ export enum NamePostFix {
     SERVICE = "Service",
     TASK_DEFINITION = "TDef",
     TARGET_GROUP = "TGroup",
+    SCHEDULER_EVENT_RULE = 'TScheduler',
 
     // Service auto scaling specific
     AutoScalingRole = "ASRole",

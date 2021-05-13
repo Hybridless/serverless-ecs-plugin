@@ -3,51 +3,65 @@ export type IPlugin = IClusterOptions[];
 
 //Cluster (ECS Cluster)
 export interface IClusterOptions {
+    tags?: object;
+    //Load balancer
     public: boolean;
     disableELB?: boolean;
     elbListenerArn?: string;
     timeout?: number; //ELB timeout, defaults to 30
+    //Cluster
     clusterName: string;
     clusterArns?: {
         ecsClusterArn: string;
         ecsIngressSecGroupId: string;
     };
-    executionRoleArn?: string; // role for services, generated if not specfied
-    vpc: IVPCOptions;
-    tags?: object;
     services: IServiceOptions[];
+    //IAM
+    executionRoleArn?: string; // role for services, generated if not specfied
+    //VPC
+    vpc: IVPCOptions;
 }
 
 //Service/Task (1:1 here)
 export interface IServiceOptions {
     name: string;
-    cpu: number;
-    memory: number;
-    port?: number; // docker port (the port exposed on the docker image) - if not specified random port will be used - usefull for busy private subnets 
-    entryPoint?: string[]; //custom container entry point
+    environment?: { [key: string]: (string | object )};
+    //ASG
+    autoScale?: IServiceAutoScalingOptions;
+    //Load balancer
     disableELB?: boolean; //useful for disabling ELB listeners on a cluster that has ELB and more tasks with ELB enabled
+    port?: number; // docker port (the port exposed on the docker image) - if not specified random port will be used - usefull for busy private subnets 
     hostname?: string | string[]; //optional hostname for filter on ELB 
     limitSourceIPs?: string | string[]; //optional limit source IPs on ELB
     limitHeaders?: { Name: string, Value: string | string[] }[]; //optional limit headers on ELB
-    environment?: { [key: string]: (string | object )};
     protocols: IServiceProtocolOptions[];
-    image?: string;
-    imageRepository?: string;
-    imageTag?: string;
     priority?: number; // priority for routing, defaults to 1
     path?: string | { path: string, method?: string }[]; // path the LB should send traffic to, defaults '*' (everything)
-    desiredCount?: number; // defaults to 1
-    ec2LaunchType?: boolean; //defaults to false, if true will laucnh task into EC2
-    daemonEc2Type?: boolean; //default to false, and only considered when ec2LaunchType is true
-    autoScale?: IServiceAutoScalingOptions;
-    taskRoleArn?: string | object;
     healthCheckUri?: string; // defaults to "/"
     healthCheckProtocol?: string; // defaults to "HTTP"
     healthCheckInterval?: number // in seconds, defaults to 6 seconds
     healthCheckTimeout?: number; // in seconds, defaults to 5 seconds
     healthCheckHealthyCount?: number; // defaults to 2
     healthCheckUnhealthyCount?: number; // defaults to 2
+    //Logs
     logsMultilinePattern?: string; //regex pattern to match multiline logs (useful for js objects for example)
+    //IAM
+    taskRoleArn?: string | object;
+    //concurrency and task configurations
+    desiredCount?: number; // defaults to 1
+    ec2LaunchType?: boolean; //defaults to false, if true will laucnh task into EC2
+    daemonEc2Type?: boolean; //default to false, and only considered when ec2LaunchType is true
+    cpu: number;
+    memory: number;
+    //docker images
+    image?: string;
+    entryPoint?: string[]; //custom container entry point
+    imageRepository?: string;
+    imageTag?: string;
+    //scheduler
+    schedulerRate?: string; //creates event rule to invoke task the concurrency below or if not specified it will use 1
+    schedulerConcurrency?: number;
+    schedulerInput?: any;
 }
 
 //VPC

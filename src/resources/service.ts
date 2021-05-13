@@ -44,6 +44,7 @@ export class Service extends Resource<IServiceOptions> {
             this.generateTaskDefinition(),
             this.generateTargetGroup(),
             this.generateLogGroup(),
+            this.generateSchedulerEventRule(),
             ...this.protocols.map((protocol: Protocol): any => protocol.generate()),
             this.generateAutoscaling(),
             executionRole // could be undefined, so set it last
@@ -80,7 +81,7 @@ export class Service extends Resource<IServiceOptions> {
                         "MaximumPercent": 200,
                         "MinimumHealthyPercent": 75
                     },
-                    "DesiredCount": this.options.desiredCount ? this.options.desiredCount : 1,
+                    "DesiredCount": (this.options.desiredCount ? this.options.desiredCount : 1),
                     ...(!this.options.ec2LaunchType ? {"NetworkConfiguration": {
                         "AwsvpcConfiguration": {
                             "AssignPublicIp": (this.cluster.isPublic() ? "ENABLED" : "DISABLED"),
@@ -180,6 +181,37 @@ export class Service extends Resource<IServiceOptions> {
                     "Protocol": "HTTP", //inside vpc we theorically are good, but HTTPS should be implement on the future for sure. TODO
                     "UnhealthyThresholdCount": this.options.healthCheckUnhealthyCount ? this.options.healthCheckUnhealthyCount : 2,
                     "VpcId": this.cluster.getVPC().getRefName()
+                }
+            }
+        };
+    }
+
+    private generateSchedulerEventRule(): any {
+        if (!this.options.schedulerRate) return {};
+        return {
+            [this.getName(NamePostFix.SCHEDULER_EVENT_RULE)]: {
+                "Type": "AWS::Events::Rule",
+                "Properties": {
+                    "Description": `Scheduler for task ${this.getName(NamePostFix.TASK_DEFINITION)}`,
+                    "Name": this.getName(NamePostFix.SCHEDULER_EVENT_RULE),
+                    "ScheduleExpression": this.options.schedulerRate,
+                    "State": "ENABLED",
+                    "Targets": [
+                        {
+                            "Id": this.getName(NamePostFix.SCHEDULER_EVENT_RULE),
+                            "RoleArn": this.getExecutionRoleValue(),
+                            "EcsParameters": {
+                                "TaskDefinitionArn": { "Ref": this.getName(NamePostFix.TASK_DEFINITION) },
+                                "TaskCount": (this.options.schedulerConcurrency || 1)
+                            },
+                            "Arn": {
+                                "Fn::GetAtt": [ this.cluster.getName(NamePostFix.CLUSTER), "Arn" ]
+                            },
+                            ...(this.options.schedulerInput ? {
+                                "Input": (typeof this.options.schedulerInput == 'string' ? typeof this.options.schedulerInput : JSON.stringify(this.options.schedulerInput))
+                            } : {})
+                        }
+                    ]
                 }
             }
         };
