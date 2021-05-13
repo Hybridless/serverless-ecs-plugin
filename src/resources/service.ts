@@ -75,6 +75,7 @@ export class Service extends Resource<IServiceOptions> {
                     ...(this.getTags() ? { "Tags": this.getTags() } : {}),
                     ...(this.hasTags() ? { "EnableECSManagedTags": true } : {}),
                     "LaunchType": (this.options.ec2LaunchType ? "EC2" : "FARGATE"),
+                    ...(this.options.ec2LaunchType && this.options.daemonEc2Type ? { "SchedulingStrategy": "DAEMON" } : {}),
                     "DeploymentConfiguration": {
                         "MaximumPercent": 200,
                         "MinimumHealthyPercent": 75

@@ -38,6 +38,7 @@ export interface IServiceOptions {
     path?: string | { path: string, method?: string }[]; // path the LB should send traffic to, defaults '*' (everything)
     desiredCount?: number; // defaults to 1
     ec2LaunchType?: boolean; //defaults to false, if true will laucnh task into EC2
+    daemonEc2Type?: boolean; //default to false, and only considered when ec2LaunchType is true
     autoScale?: IServiceAutoScalingOptions;
     taskRoleArn?: string | object;
     healthCheckUri?: string; // defaults to "/"
