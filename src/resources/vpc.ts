@@ -1,4 +1,4 @@
-import {IVPCOptions} from "../options";
+import {IVPCOptions, IVPCOptions_Dedicated, IVPCOptions_Shared} from "../options";
 import {NamePostFix, Resource} from "../resource";
 
 export class VPC extends Resource<IVPCOptions> {
@@ -8,7 +8,7 @@ export class VPC extends Resource<IVPCOptions> {
     public constructor(stage: string, options: IVPCOptions, tags?: object) {
         super(options, stage, null, tags);
         //subnetIds don't enforce mapping due allowance of instrinsict functions object
-        this.subnets = (this.useExistingVPC() ? this.options.subnetIds : this.options.subnets
+        this.subnets = (this.useExistingVPC() ? (this.options as IVPCOptions_Shared).subnetIds : (this.options as IVPCOptions_Dedicated).subnets
             .map((subnet: string, index: number): string => `${this.getName(NamePostFix.SUBNET_NAME)}${index}`));
     }
 
@@ -17,29 +17,29 @@ export class VPC extends Resource<IVPCOptions> {
     }
 
     public useExistingVPC(): boolean {
-        return !!(this.options.vpcId && this.options.vpcId != 'null' && 
-                  this.options.securityGroupIds && (<string><unknown>this.options.securityGroupIds) != 'null' &&
-                  this.options.subnetIds && (<string><unknown>this.options.subnetIds) != 'null');
+        return !!((this.options as IVPCOptions_Shared).vpcId && (this.options as IVPCOptions_Shared).vpcId != 'null' && 
+                  (this.options as IVPCOptions_Shared).securityGroupIds && (<string><unknown>(this.options as IVPCOptions_Shared).securityGroupIds) != 'null' &&
+                  (this.options as IVPCOptions_Shared).subnetIds && (<string><unknown>(this.options as IVPCOptions_Shared).subnetIds) != 'null');
     }
 
     public getRefName(): any {
-        if (this.useExistingVPC()) return this.options.vpcId;
+        if (this.useExistingVPC()) return (this.options as IVPCOptions_Shared).vpcId;
         return { "Ref": super.getName(NamePostFix.VPC) };
     }
 
     public getSecurityGroups(): string[] {
-        return this.options.securityGroupIds;
+        return (this.options as IVPCOptions_Shared).securityGroupIds;
     }
 
     public getSubnets(): any[] {
-        return (this.useExistingVPC() ? this.options.subnetIds : this.subnets.map(subnet => ({
+        return (this.useExistingVPC() ? (this.options as IVPCOptions_Shared).subnetIds : this.subnets.map(subnet => ({
             "Ref": subnet
         })));
     }
 
     public generate(): any {
-        const vpc: string = this.options.cidr;
-        const subnets: string[] = this.options.subnets;
+        const vpc: string = (this.options as IVPCOptions_Dedicated).cidr;
+        const subnets: string[] = (this.options as IVPCOptions_Dedicated).subnets;
         //vpc in generate only if no existing vpc is specified
         if (!this.useExistingVPC()) return this.generateVPC(vpc, subnets);
         return null;
@@ -106,7 +106,7 @@ export class VPC extends Resource<IVPCOptions> {
     }
     
     private generateSubnets(subnets: string[]): any[] {
-        const subnetNames: string[] = this.options.subnets;
+        const subnetNames: string[] = (this.options as IVPCOptions_Dedicated).subnets;
 
         return subnets.map((subnet: string, index: number): object => {
             const subnetName: string = `${this.getName(NamePostFix.SUBNET_NAME)}${index}`;

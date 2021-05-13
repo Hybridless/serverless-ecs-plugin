@@ -90,7 +90,7 @@ export class Cluster extends Resource<IClusterOptions> {
                     "DeletionPolicy": "Delete",
                     "Properties": {
                         ...(this.getTags() ? { "Tags": this.getTags() } : {}),
-                        "GroupDescription": "Access to the Fargate containers",
+                        "GroupDescription": "Access to the ECS containers",
                         "VpcId": this.getVPC().getRefName()
                     }
                 },

@@ -107,10 +107,10 @@ provider:
   stage: example
 
 plugins:
-- serverless-fargate-plugin
+- serverless-ecs-plugin
 
 custom:
-  fargate:
+  ecs:
     clusterName: Test
     vpc:
       cidr: 10.0.0.0/16

@@ -6,7 +6,8 @@
   "homepage": "https://github.com/hybridless/serverless-ecs-plugin",
   "scripts": {
     "clean": "rm -rf ./*.js ./*.js.map ./bin/ ./.serverless/ ./resources/",
-    "build": "npm run clean && tsc -p ./tsconfig.json",
+    "generate-plugin-schema": "typescript-json-schema --required --noExtraProps src/options.ts '*' > options.json && node config/export-plugin-schema.js",
+    "build": "npm run clean && npm run generate-plugin-schema && tsc -p ./tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "contributors": [
@@ -17,7 +18,9 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^4.2.3"
+    "json-schema-ref-parser": "^9.0.7",
+    "typescript": "^4.2.3",
+    "typescript-json-schema": "^0.50.0"
   },
   "dependencies": {}
 }

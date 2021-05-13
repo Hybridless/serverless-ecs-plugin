@@ -28,11 +28,11 @@ export class Service extends Resource<IServiceOptions> {
         this.protocols = (this.cluster.getOptions().disableELB || this.options.disableELB ? [] : this.options.protocols.map((serviceProtocolOptions: IServiceProtocolOptions, index): any => {
             //use specified port for the first protocol
             this.ports[index] = (this.options.port && index == 0 ? this.options.port : (Math.floor(Math.random() * 49151) + 1024));
-            console.debug(`Serverless: fargate-plugin: Using port ${this.ports[index]} for service ${options.name} on cluster ${cluster.getName(NamePostFix.CLUSTER)} - protocol ${serviceProtocolOptions.protocol}`);
+            console.debug(`Serverless: ecs-plugin: Using port ${this.ports[index]} for service ${options.name} on cluster ${cluster.getName(NamePostFix.CLUSTER)} - protocol ${serviceProtocolOptions.protocol}`);
             return new Protocol(cluster, this, stage, serviceProtocolOptions, this.ports[index], tags);
         }));
         //we do not use UID on log group name because we want to persist logs from one deployment to another
-        this.logGroupName = `/aws/fargate/${this.cluster.getNamePrefix()}/${this.stage}/${options.name}`;
+        this.logGroupName = `/aws/ecs/${this.cluster.getNamePrefix()}/${this.stage}/${options.name}`;
     }
 
     public generate(): any {

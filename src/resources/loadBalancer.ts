@@ -122,7 +122,8 @@ export class LoadBalancer extends Resource<IClusterOptions> {
                     }
                 )
             } : {
-                /*TODO: if not public AND also not specifiying a VPC, different secgroup must be created*/
+                /*TODO: if not public AND also not specifiying a VPC, different secgroup must be created
+                        - in/outbound from all subnets on the vpc? */
             })
         }
     }
@@ -173,7 +174,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
             for (let proto of service.protocols) {
                 if (mappings[proto.port]) {
                     if (mappings[proto.port].proto.getOptions().protocol != proto.getOptions().protocol) {
-                        throw new Error(`Serverless: fargate-plugin: Service ${service.getOptions().name} on cluster ${this.cluster.getName(NamePostFix.CLUSTER)}, protocol ${proto.getOptions().protocol} is colliding with different service at same cluster on port ${proto.port}. Can't continue!`);
+                        throw new Error(`Serverless: ecs-plugin: Service ${service.getOptions().name} on cluster ${this.cluster.getName(NamePostFix.CLUSTER)}, protocol ${proto.getOptions().protocol} is colliding with different service at same cluster on port ${proto.port}. Can't continue!`);
                     }
                     mappings[proto.port].services.push(service);
                     //TODO: create error if using shared ecs, ports should be dynamically found

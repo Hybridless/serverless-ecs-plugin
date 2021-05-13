@@ -1,0 +1,360 @@
+{
+  "items": {
+    "additionalProperties": false,
+    "properties": {
+      "clusterArns": {
+        "additionalProperties": false,
+        "properties": {
+          "ecsClusterArn": {
+            "type": "string"
+          },
+          "ecsIngressSecGroupId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ecsClusterArn",
+          "ecsIngressSecGroupId"
+        ],
+        "type": "object"
+      },
+      "clusterName": {
+        "type": "string"
+      },
+      "disableELB": {
+        "type": "boolean"
+      },
+      "elbListenerArn": {
+        "type": "string"
+      },
+      "executionRoleArn": {
+        "type": "string"
+      },
+      "public": {
+        "type": "boolean"
+      },
+      "services": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "autoScale": {
+              "additionalProperties": false,
+              "properties": {
+                "cooldown": {
+                  "type": "number"
+                },
+                "cooldownIn": {
+                  "type": "number"
+                },
+                "cooldownOut": {
+                  "type": "number"
+                },
+                "max": {
+                  "type": "number"
+                },
+                "metric": {
+                  "enum": [
+                    0,
+                    1,
+                    10,
+                    11,
+                    12,
+                    13,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9
+                  ],
+                  "type": "number"
+                },
+                "min": {
+                  "type": "number"
+                },
+                "targetValue": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "metric",
+                "targetValue"
+              ],
+              "type": "object"
+            },
+            "cpu": {
+              "type": "number"
+            },
+            "desiredCount": {
+              "type": "number"
+            },
+            "disableELB": {
+              "type": "boolean"
+            },
+            "ec2LaunchType": {
+              "type": "boolean"
+            },
+            "entryPoint": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "environment": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "healthCheckHealthyCount": {
+              "type": "number"
+            },
+            "healthCheckInterval": {
+              "type": "number"
+            },
+            "healthCheckProtocol": {
+              "type": "string"
+            },
+            "healthCheckTimeout": {
+              "type": "number"
+            },
+            "healthCheckUnhealthyCount": {
+              "type": "number"
+            },
+            "healthCheckUri": {
+              "type": "string"
+            },
+            "hostname": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "image": {
+              "type": "string"
+            },
+            "imageRepository": {
+              "type": "string"
+            },
+            "imageTag": {
+              "type": "string"
+            },
+            "limitHeaders": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "Name": {
+                    "type": "string"
+                  },
+                  "Value": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "Name",
+                  "Value"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "limitSourceIPs": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "logsMultilinePattern": {
+              "type": "string"
+            },
+            "memory": {
+              "type": "number"
+            },
+            "name": {
+              "type": "string"
+            },
+            "path": {
+              "anyOf": [
+                {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "method": {
+                        "type": "string"
+                      },
+                      "path": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "port": {
+              "type": "number"
+            },
+            "priority": {
+              "type": "number"
+            },
+            "protocols": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "authorizer": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "clientId": {
+                        "type": "string"
+                      },
+                      "poolArn": {
+                        "type": "string"
+                      },
+                      "poolDomain": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "clientId",
+                      "poolArn",
+                      "poolDomain"
+                    ],
+                    "type": "object"
+                  },
+                  "certificateArns": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "protocol": {
+                    "enum": [
+                      "HTTP",
+                      "HTTPS"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "protocol"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "taskRoleArn": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "cpu",
+            "entryPoint",
+            "memory",
+            "name",
+            "protocols"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "tags": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      },
+      "timeout": {
+        "type": "number"
+      },
+      "vpc": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "cidr": {
+                "type": "string"
+              },
+              "subnets": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "cidr",
+              "subnets"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "securityGroupIds": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "subnetIds": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "vpcId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "securityGroupIds",
+              "subnetIds",
+              "vpcId"
+            ],
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "required": [
+      "clusterName",
+      "public",
+      "services",
+      "vpc"
+    ],
+    "type": "object"
+  },
+  "type": "array"
+}
