@@ -100,55 +100,51 @@ Array<{
 #### Examples
 ```yaml
 service: example-service
-
 provider:
   name: aws
   region: us-east-1
   stage: example
-
 plugins:
-- serverless-ecs-plugin
-
-custom:
-  ecs:
-    clusterName: Test
-    vpc:
-      cidr: 10.0.0.0/16
-      subnets:
-      - 10.0.0.0/24
-      - 10.0.1.0/24
-    tags:
-      customer: You
-      owner: Me
-    disableELB: false
-    services:
-    - name: example-name
-      cpu: 512
-      memory: 1024
-      port: 80
-      healthCheckUri: /health
-      healthCheckInterval: 6
-      imageTag: 1.0.0
-      imageRepository: xxx.amazonaws.com/xxx
-      autoScale:
-        min: 1
-        max: 10
-        cooldownIn: 30
-        cooldownOut: 60
-        metric: ECSServiceAverageCPUUtilization
-        targetValue: 75
-      entryPoint:
-      - npm
-      - run
-      - start
-      environment:
-        PRODUCTION: true
-        ECS_ENABLE_CONTAINER_METADATA: true #https://stackoverflow.com/questions/48819809/how-to-get-task-id-from-within-ecs-container
-      protocols:
-      - protocol: HTTP
-      - protocol: HTTPS
-        certificateArns:
-        - xxxx
+  - serverless-ecs-plugin
+ecs:
+  clusterName: Test
+  vpc:
+    cidr: 10.0.0.0/16
+    subnets:
+    - 10.0.0.0/24
+    - 10.0.1.0/24
+  tags:
+    customer: You
+    owner: Me
+  disableELB: false
+  services:
+  - name: example-name
+    cpu: 512
+    memory: 1024
+    port: 80
+    healthCheckUri: /health
+    healthCheckInterval: 6
+    imageTag: 1.0.0
+    imageRepository: xxx.amazonaws.com/xxx
+    autoScale:
+      min: 1
+      max: 10
+      cooldownIn: 30
+      cooldownOut: 60
+      metric: ECSServiceAverageCPUUtilization
+      targetValue: 75
+    entryPoint:
+    - npm
+    - run
+    - start
+    environment:
+      PRODUCTION: true
+      ECS_ENABLE_CONTAINER_METADATA: true #https://stackoverflow.com/questions/48819809/how-to-get-task-id-from-within-ecs-container
+    protocols:
+    - protocol: HTTP
+    - protocol: HTTPS
+      certificateArns:
+      - xxxx
 
 ```
 
