@@ -4,6 +4,7 @@ export type IPlugin = IClusterOptions[];
 //Cluster (ECS Cluster)
 export interface IClusterOptions {
     tags?: object;
+    enableContainerInsights?: boolean; //default is respecting account settings
     //Load balancer
     public: boolean;
     disableELB?: boolean;

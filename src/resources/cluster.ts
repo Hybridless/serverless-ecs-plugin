@@ -73,6 +73,7 @@ export class Cluster extends Resource<IClusterOptions> {
                     "Properties": {
                         "ClusterName": this.getName(NamePostFix.CLUSTER),
                         ...(this.getTags() ? { "Tags": this.getTags() } : {}),
+                        ...(this.options.enableContainerInsights ? { "ClusterSettings": [{ Name: 'containerInsights', value: 'enabled' }] } : {})
                     }
                 },
                 ...this.getClusterSecurityGroups(),
