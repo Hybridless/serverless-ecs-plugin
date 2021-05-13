@@ -24,12 +24,12 @@ export interface IServiceOptions {
     cpu: number;
     memory: number;
     port?: number; // docker port (the port exposed on the docker image) - if not specified random port will be used - usefull for busy private subnets 
-    entryPoint: string[]; //custom container entry point
+    entryPoint?: string[]; //custom container entry point
     disableELB?: boolean; //useful for disabling ELB listeners on a cluster that has ELB and more tasks with ELB enabled
     hostname?: string | string[]; //optional hostname for filter on ELB 
     limitSourceIPs?: string | string[]; //optional limit source IPs on ELB
     limitHeaders?: { Name: string, Value: string | string[] }[]; //optional limit headers on ELB
-    environment?: { [key: string]: string };
+    environment?: { [key: string]: (string | object )};
     protocols: IServiceProtocolOptions[];
     image?: string;
     imageRepository?: string;
@@ -39,7 +39,7 @@ export interface IServiceOptions {
     desiredCount?: number; // defaults to 1
     ec2LaunchType?: boolean; //defaults to false, if true will laucnh task into EC2
     autoScale?: IServiceAutoScalingOptions;
-    taskRoleArn?: string;
+    taskRoleArn?: string | object;
     healthCheckUri?: string; // defaults to "/"
     healthCheckProtocol?: string; // defaults to "HTTP"
     healthCheckInterval?: number // in seconds, defaults to 6 seconds

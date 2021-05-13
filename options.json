@@ -104,7 +104,16 @@
             },
             "environment": {
               "additionalProperties": {
-                "type": "string"
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "properties": {},
+                    "type": "object"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
               },
               "type": "object"
             },
@@ -276,12 +285,20 @@
               "type": "array"
             },
             "taskRoleArn": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "additionalProperties": true,
+                  "properties": {},
+                  "type": "object"
+                },
+                {
+                  "type": "string"
+                }
+              ]
             }
           },
           "required": [
             "cpu",
-            "entryPoint",
             "memory",
             "name",
             "protocols"
