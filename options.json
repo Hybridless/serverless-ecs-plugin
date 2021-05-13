@@ -84,8 +84,34 @@
               ],
               "type": "object"
             },
+            "capacityProviderStrategy": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "base": {
+                    "type": "number"
+                  },
+                  "capacityProvider": {
+                    "type": "string"
+                  },
+                  "weight": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "base",
+                  "capacityProvider",
+                  "weight"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
             "cpu": {
               "type": "number"
+            },
+            "daemonEc2Type": {
+              "type": "boolean"
             },
             "desiredCount": {
               "type": "number"
@@ -233,11 +259,69 @@
                 }
               ]
             },
+            "placementConstraints": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "expression": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "distinctInstance",
+                      "memberOf"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "expression",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "placementStrategies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "field": {
+                    "enum": [
+                      "string"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "binpack",
+                      "random",
+                      "spread"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
             "port": {
               "type": "number"
             },
             "priority": {
               "type": "number"
+            },
+            "propagateTags": {
+              "enum": [
+                "OFF",
+                "SERVICE",
+                "TASK"
+              ],
+              "type": "string"
             },
             "protocols": {
               "items": {
@@ -283,6 +367,13 @@
                 "type": "object"
               },
               "type": "array"
+            },
+            "schedulerConcurrency": {
+              "type": "number"
+            },
+            "schedulerInput": {},
+            "schedulerRate": {
+              "type": "string"
             },
             "taskRoleArn": {
               "anyOf": [

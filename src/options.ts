@@ -26,6 +26,7 @@ export interface IClusterOptions {
 export interface IServiceOptions {
     name: string;
     environment?: { [key: string]: (string | object )};
+    propagateTags?: PropagateTagsType; //defaults to off
     //ASG
     autoScale?: IServiceAutoScalingOptions;
     //Load balancer
@@ -53,6 +54,9 @@ export interface IServiceOptions {
     daemonEc2Type?: boolean; //default to false, and only considered when ec2LaunchType is true
     cpu: number;
     memory: number;
+    placementConstraints?: { expression: string, type: 'distinctInstance' | 'memberOf' }[];
+    placementStrategies?: { field: 'string', type: 'binpack' | 'random' | 'spread' }[];
+    capacityProviderStrategy?: { base: number, capacityProvider: string, weight: number }[];
     //docker images
     image?: string;
     entryPoint?: string[]; //custom container entry point
@@ -89,7 +93,7 @@ export interface IServiceProtocolOptions {
 }
 
 //ASG
-enum AutoScalingMetricType {
+export enum AutoScalingMetricType {
     ALBRequestCountPerTarget,
     AppStreamAverageCapacityUtilization,
     ComprehendInferenceUtilization,
@@ -114,3 +118,10 @@ export interface IServiceAutoScalingOptions {
     cooldownOut?: number; //defaults to cooldown but has priority over it
     targetValue: number;
 }
+
+//Misc
+export enum PropagateTagsType {
+    OFF = 'OFF', 
+    SERVICE = 'SERVICE', 
+    TASK = 'TASK'
+};

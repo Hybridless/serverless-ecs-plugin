@@ -1,4 +1,4 @@
-import {IServiceOptions, IServiceProtocolOptions} from "../options";
+import { IServiceOptions, IServiceProtocolOptions, PropagateTagsType} from "../options";
 import {Cluster} from "./cluster";
 import {NamePostFix, Resource} from "../resource";
 import {Protocol} from "./protocol";
@@ -102,7 +102,12 @@ export class Service extends Resource<IServiceOptions> {
                                 }
                             }
                         ]
-                    })
+                    }),
+                    ...(this.options.propagateTags && this.options.propagateTags != PropagateTagsType.OFF ? { "PropagateTags": this.options.propagateTags } : {}),
+                    ...(this.options.placementConstraints ? { "PlacementConstraints": this.options.placementConstraints.map((a) => ({ Expression: a.expression, Type: a.type })) } : {}),
+                    ...(this.options.placementStrategies ? { "PlacementStrategies": this.options.placementStrategies.map((a) => ({ Field: a.field, Type: a.type })) } : {}),
+                    ...(this.options.capacityProviderStrategy ? { "CapacityProviderStrategy": this.options.capacityProviderStrategy.map((a) => ({ Base: a.base, Weight: a.weight, CapacityProvider: a.capacityProvider })) } : {}),
+                    
                 }
             },
         };
