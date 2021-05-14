@@ -18,15 +18,15 @@ export class LoadBalancer extends Resource<IClusterOptions> {
 
     public generate(): any {
         return Object.assign({
-            ...(this.options.disableELB ? {} : {
-                ...(this.options.elbListenerArn ? {} : {
+            ...(this.options.albDisabled ? {} : {
+                ...(this.options.albListenerArn ? {} : {
                     [this.getName(NamePostFix.LOAD_BALANCER)]: {
                         "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
                         "DeletionPolicy": "Delete",
                         "Properties": {
                             "Name": this.getName(NamePostFix.LOAD_BALANCER),
                             ...(this.getTags() ? { "Tags": this.getTags() } : {}),
-                            "Scheme": (this.cluster.isPublic() ? "internet-facing" : "internal"),
+                            "Scheme": (this.options.albPrivate ? "internet-facing" : "internal"),
                             "LoadBalancerAttributes": [
                                 {
                                     "Key": "idle_timeout.timeout_seconds",
@@ -34,7 +34,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
                                 }
                             ],
                             "Subnets": this.cluster.getVPC().getSubnets(),
-                            "SecurityGroups": this.getELBSecurityGroupsRef()
+                            "SecurityGroups": this.getALBSecurityGroupsRef()
                         },
                     },
                     ...this.getListeners()
@@ -46,10 +46,12 @@ export class LoadBalancer extends Resource<IClusterOptions> {
 
 
     /* Security groups */
-    private getELBSecurityGroupsRef(): any {;
+    private getALBSecurityGroupsRef(): any {;
         let secGroups = [];
         this.cluster.services.forEach((service: Service) => {
-            if (this.options.public && !service.getOptions().disableELB) {
+            //service has alb enabled and is public
+            if (service.ports && !this.cluster.getOptions().albDisabled && !service.getOptions().doNotAlbAttach && 
+                !this.cluster.getOptions().albPrivate) {
                 secGroups.push({ "Ref": this.getSecurityGroupNameByService(service) });
             }
         });
@@ -80,11 +82,13 @@ export class LoadBalancer extends Resource<IClusterOptions> {
     }
 
     private generateSecurityGroupsByService(service: Service): any {
-        const ELBServiceSecGroup = this.getSecurityGroupNameByService(service);
+        //check if alb is enabled for this service
+        if (!service.ports || this.cluster.getOptions().albDisabled || service.getOptions().doNotAlbAttach) return {};
+        const ALBServiceSecGroup = this.getSecurityGroupNameByService(service);
         return {
             //Public security groups
-            ...(this.options.public && !service.getOptions().disableELB ? {
-                [ELBServiceSecGroup]: {
+            ...(!this.cluster.getOptions().albPrivate ? {
+                [ALBServiceSecGroup]: {
                     "Type": "AWS::EC2::SecurityGroup",
                     "DeletionPolicy": "Delete",
                     "Properties": {
@@ -107,7 +111,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
                 },
                 ...(!this.cluster.getVPC().useExistingVPC() &&
                     {
-                        [ELBServiceSecGroup + NamePostFix.SECURITY_GROUP_INGRESS_ALB]: {
+                        [ALBServiceSecGroup + NamePostFix.SECURITY_GROUP_INGRESS_ALB]: {
                             "Type": "AWS::EC2::SecurityGroupIngress",
                             "DeletionPolicy": "Delete",
                             "Properties": {
@@ -115,7 +119,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
                                 "GroupId": this.cluster.getClusterIngressSecGroup(),
                                 "IpProtocol": -1,
                                 "SourceSecurityGroupId": {
-                                    "Ref": ELBServiceSecGroup
+                                    "Ref": ALBServiceSecGroup
                                 }
                             }
                         }
@@ -128,7 +132,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
         }
     }
 
-    /* Elastic Load Balance -- this should be moved to ELB class when implemented */
+    /* Elastic Load Balance -- this should be moved to ALB class when implemented */
     private getListeners(): any {
         const aggServices = this.getAggregatedServices();
         let listeners = {};

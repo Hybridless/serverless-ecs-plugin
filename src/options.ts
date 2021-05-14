@@ -6,10 +6,10 @@ export interface IClusterOptions {
     tags?: object;
     enableContainerInsights?: boolean; //default is respecting account settings
     //Load balancer
-    public: boolean;
-    disableELB?: boolean;
-    elbListenerArn?: string;
-    timeout?: number; //ELB timeout, defaults to 30
+    albPrivate?: boolean; //default to false, and only considered when auto creating ALB
+    albDisabled?: boolean;
+    albListenerArn?: string;
+    timeout?: number; //ALB timeout, defaults to 30
     //Cluster
     clusterName: string;
     clusterArns?: {
@@ -31,11 +31,11 @@ export interface IServiceOptions {
     //ASG
     autoScale?: IServiceAutoScalingOptions;
     //Load balancer
-    disableELB?: boolean; //useful for disabling ELB listeners on a cluster that has ELB and more tasks with ELB enabled
-    port?: number; // docker port (the port exposed on the docker image) - if not specified random port will be used - usefull for busy private subnets 
-    hostname?: string | string[]; //optional hostname for filter on ELB 
-    limitSourceIPs?: string | string[]; //optional limit source IPs on ELB
-    limitHeaders?: { name: string, value: string | string[] }[]; //optional limit headers on ELB
+    doNotAlbAttach?: boolean; //useful for disabling ALB listeners on a cluster that has ALB and more tasks with ALB enabled
+    port?: number | false; // docker port (the port exposed on the docker image) - if not specified random port will be used - usefull for busy private subnets -- false will disable the ports completly
+    hostname?: string | string[]; //optional hostname for filter on ALB 
+    limitSourceIPs?: string | string[]; //optional limit source IPs on ALB
+    limitHeaders?: { name: string, value: string | string[] }[]; //optional limit headers on ALB
     protocols: IServiceProtocolOptions[];
     path?: string | { path: string, method?: string, priority: number }[]; // path the LB should send traffic to, defaults '*' (everything) nad users priority 1 on the ALB
     healthCheckUri?: string; // defaults to "/"
@@ -54,9 +54,12 @@ export interface IServiceOptions {
     daemonEc2Type?: boolean; //default to false, and only considered when ec2LaunchType is true
     cpu: number;
     memory: number;
+    //ec2
     placementConstraints?: { expression: string, type: 'distinctInstance' | 'memberOf' }[];
     placementStrategies?: { field: 'string', type: 'binpack' | 'random' | 'spread' }[];
     capacityProviderStrategy?: { base: number, capacityProvider: string, weight: number }[];
+    //fargate
+    enablePublicIPAssign?: boolean; //only used on fargate (not in ec2)
     //docker images
     image?: string;
     entryPoint?: string[]; //custom container entry point

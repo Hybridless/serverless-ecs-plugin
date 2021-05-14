@@ -24,20 +24,23 @@ export class Service extends Resource<IServiceOptions> {
         super(options, stage, safeResourceName, tags); 
         this.cluster = cluster;
         this.executionRole = `${cluster.getNamePrefix()}ECSServiceExecutionRole${this.stage}`;
-        this.ports = [];
-        this.protocols = (this.cluster.getOptions().disableELB || this.options.disableELB ? [] : this.options.protocols.map((serviceProtocolOptions: IServiceProtocolOptions, index): any => {
-            //use specified port for the first protocol
-            this.ports[index] = (this.options.port && index == 0 ? this.options.port : (Math.floor(Math.random() * 49151) + 1024));
-            console.debug(`Serverless: ecs-plugin: Using port ${this.ports[index]} for service ${options.name} on cluster ${cluster.getName(NamePostFix.CLUSTER)} - protocol ${serviceProtocolOptions.protocol}`);
-            return new Protocol(cluster, this, stage, serviceProtocolOptions, this.ports[index], tags);
-        }));
+        this.ports = (this.options.port === false ? null : []);
+        //Only generate protocols if needed
+        this.protocols = (!this.ports || this.cluster.getOptions().albDisabled || this.options.doNotAlbAttach ?
+            [] : 
+            this.options.protocols.map((serviceProtocolOptions: IServiceProtocolOptions, index): any => {
+                //use specified port for the first protocol
+                this.ports[index] = (this.options.port && index == 0 ? this.options.port : (Math.floor(Math.random() * 49151) + 1024));
+                console.debug(`Serverless: ecs-plugin: Using port ${this.ports[index]} for service ${options.name} on cluster ${cluster.getName(NamePostFix.CLUSTER)} - protocol ${serviceProtocolOptions.protocol}`);
+                return new Protocol(cluster, this, stage, serviceProtocolOptions, this.ports[index], tags);
+            }
+        ));
         //we do not use UID on log group name because we want to persist logs from one deployment to another
         this.logGroupName = `/aws/ecs/${this.cluster.getNamePrefix()}/${this.stage}/${options.name}`;
     }
 
     public generate(): any {
         const executionRole: any | undefined = this.cluster.getExecutionRoleArn() ? undefined : this.generateExecutionRole();
-
         return Object.assign(
             {},
             this.generateService(),
@@ -67,7 +70,7 @@ export class Service extends Resource<IServiceOptions> {
             [this.getName(NamePostFix.SERVICE)]: {
                 "Type": "AWS::ECS::Service",
                 "DeletionPolicy": "Delete",
-                ...(this.cluster.getOptions().disableELB || this.options.disableELB ? {} : {
+                ...(!this.ports || this.cluster.getOptions().albDisabled || this.options.doNotAlbAttach ? {} : {
                     "DependsOn": this.getListenerRules(),
                 }),
                 "Properties": {
@@ -84,7 +87,7 @@ export class Service extends Resource<IServiceOptions> {
                     "DesiredCount": (this.options.desiredCount ? this.options.desiredCount : 1),
                     ...(!this.options.ec2LaunchType ? {"NetworkConfiguration": {
                         "AwsvpcConfiguration": {
-                            "AssignPublicIp": (this.cluster.isPublic() ? "ENABLED" : "DISABLED"),
+                            "AssignPublicIp": (this.options.enablePublicIPAssign ? "ENABLED" : "DISABLED"),
                             "SecurityGroups": this.getSecurityGroups(),
                             "Subnets": this.cluster.getVPC().getSubnets()
                         }
@@ -92,7 +95,7 @@ export class Service extends Resource<IServiceOptions> {
                     "TaskDefinition": {
                         "Ref": this.getName(NamePostFix.TASK_DEFINITION)
                     },
-                    ...(this.cluster.getOptions().disableELB || this.options.disableELB ? {} : {
+                    ...(this.cluster.getOptions().albDisabled || this.options.doNotAlbAttach || !this.ports ? {} : {
                         "LoadBalancers": [
                             {
                                 "ContainerName": this.getName(NamePostFix.CONTAINER_NAME),
@@ -138,7 +141,7 @@ export class Service extends Resource<IServiceOptions> {
                             "Memory": this.options.memory,
                             "Image": this.options.image || `${this.options.imageRepository}:${this.options.name}-${this.options.imageTag}`,
                             ...(this.options.entryPoint ? { "EntryPoint": this.options.entryPoint } : {}),
-                            ...(this.cluster.getOptions().disableELB || this.options.disableELB 
+                            ...(this.cluster.getOptions().albDisabled || !this.ports//|| this.options.doNotAlbAttach -- i guess we can have port exposes on the local network
                                     ? {} : {"PortMappings": [{ "ContainerPort": this.ports[0] }]}
                                 ),
                             "LogConfiguration": {
@@ -166,7 +169,7 @@ export class Service extends Resource<IServiceOptions> {
     }
 
     private generateTargetGroup(): any {
-        if (this.cluster.getOptions().disableELB || this.options.disableELB) return {};
+        if (this.cluster.getOptions().albDisabled || this.options.doNotAlbAttach || !this.ports) return {};
         //assume one protocol is available?
         const proto = (this.options.healthCheckProtocol || this.options.protocols[0].protocol || "HTTP");
         return {

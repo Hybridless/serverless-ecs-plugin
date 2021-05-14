@@ -21,10 +21,10 @@
       "clusterName": {
         "type": "string"
       },
-      "disableELB": {
+      "albDisabled": {
         "type": "boolean"
       },
-      "elbListenerArn": {
+      "albListenerArn": {
         "type": "string"
       },
       "executionRoleArn": {
@@ -116,7 +116,7 @@
             "desiredCount": {
               "type": "number"
             },
-            "disableELB": {
+            "albDisabled": {
               "type": "boolean"
             },
             "ec2LaunchType": {

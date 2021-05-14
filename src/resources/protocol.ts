@@ -26,7 +26,8 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
     }
 
     public getOutputs(): any {
-        if (this.cluster.getOptions().disableELB || this.service.getOptions().disableELB || this.cluster.getOptions().elbListenerArn) return {};
+        //do not generate output if no load balancer is created by us
+        if (this.cluster.getOptions().albListenerArn) return {};
         return {
             [this.service.getName(NamePostFix.SERVICE) + this.options.protocol]: {
                 "Description": "Elastic load balancer service endpoint",
@@ -50,7 +51,6 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
     }
 
     public generate(): any {
-        if (this.cluster.getOptions().disableELB || this.service.getOptions().disableELB) return {};
         if (this.options.protocol === "HTTPS" && (!this.options.certificateArns || this.options.certificateArns.length === 0)) {
             throw new Error('Certificate ARN required for HTTPS');
         }
@@ -149,7 +149,7 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
                             }
                         }) : []),
                     ],
-                    "ListenerArn": (this.cluster.getOptions().elbListenerArn || {
+                    "ListenerArn": (this.cluster.getOptions().albListenerArn || {
                         "Ref": this.cluster.loadBalancer.getName(NamePostFix.LOAD_BALANCER_LISTENER) + this.port
                     }),
                     "Priority": (priority || 1)

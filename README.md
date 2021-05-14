@@ -11,8 +11,8 @@ Based on templates found here: https://github.com/nathanpeck/aws-cloudformation-
 #### About
 This plugin will create a cluster, load balancer, vpc, subnets, and one or more services to associate with it. This plugin implements the following approaches:
 
-- Public VPC / Public ELB / Public Subnet 
-- Private VPC / Private ELB / Private Subnet
+- Public VPC / Public ALB / Public Subnet 
+- Private VPC / Private ALB / Private Subnet
 
 If you would like to reference the VPC elsewhere (such as other clusters). The VPC will be called `VPC{stage}` where `{stage}` is the stage in the serverless.yml. The subnets will be called `SubnetName{stage}{index}` where `{stage}`is the stage in the serverless.yml, and `{index}` references the index of the subnet that was specified in the subnets array. *THESE ARE NOT ADDED TO OUTPUT*. So you can only reference them in the same serverless.yml / same cf stack.
 
@@ -29,9 +29,9 @@ Array<{
       Customer: You
     };
     executionRoleArn?: string; // execution role for services, generated if not specified
-    disableELB?: boolean; //disable ELB creation and bindings, default to false. Usefull for long running processes
-    elbListenerArn?: string; //optionally pass a ELB listener to use instead of create an ELB + listener -- carefull with ports, they must be the same pf the listener
-    timeout?: number; //ELB timeout, defaults to 30
+    albDisabled?: boolean; //disable ALB creation and bindings, default to false. Usefull for long running processes
+    albListenerArn?: string; //optionally pass a ALB listener to use instead of create an ALB + listener -- carefull with ports, they must be the same pf the listener
+    timeout?: number; //ALB timeout, defaults to 30
     clusterArns?: { //Indicates if the cluster will not be created and an shared ECS cluster should be used instead
         ecsClusterArn: string; //ECS cluster ARN
         ecsIngressSecGroupId: string; //Ingress ECS VPC Group 
@@ -54,10 +54,10 @@ Array<{
         memory: number;
         public: boolean; //Will it be facing internet? This affects directly what security groups will be auto created
         port: number; // docker port (the port exposed on the docker image) - if not specified random port will be used (usefull for EC2 task types or busy private subnets where new services (and **re-deployments**) are allowed to have random listener ports)
-        hostname?: string | string[]; //optional hostname for filter on ELB 
-        limitSourceIPs?: string | string[]; //optional limit source IPs on ELB (only request made by the specified source IPs are allowed)
-        limitHeaders?: {Name: string, Value: string | string[]}[]; //optional limit headers on ELB (only requests made with the specified headers are allowed)
-        disableELB?: boolean; //useful for disabling ELB listeners on a cluster that has ELB and more tasks with ELB enabled
+        hostname?: string | string[]; //optional hostname for filter on ALB 
+        limitSourceIPs?: string | string[]; //optional limit source IPs on ALB (only request made by the specified source IPs are allowed)
+        limitHeaders?: {Name: string, Value: string | string[]}[]; //optional limit headers on ALB (only requests made with the specified headers are allowed)
+        albDisabled?: boolean; //useful for disabling ALB listeners on a cluster that has ALB and more tasks with ALB enabled
         entryPoint: string[]; // same as docker's entry point
         environment: { [key: string]: string }; // environment variables passed to docker container
         protocols: Array<{
@@ -82,7 +82,7 @@ Array<{
         imageRepository?: string; // image repository (used if image option is not provided)
         imageTag?: string; // image tag (used if image option is not provided)
         priority?: number; // priority for routing, defaults to 1
-        path?: string | { path: string, method?: string }[]; // path the LB should send traffic to, defaults '*' (everything) - keyword 'ANY' is allowed on method
+        path?: string | { path: string, method?: string }[]; // path the LB should send traffic to, defaults '*' (everything) - keywords 'ANY' and '*' are allowed on method
         desiredCount?: number; // number of tasks wanted by default - if not specified defaults to 1
         ec2LaunchType?: boolean; //defaults to false, if true will launch task into EC2
         taskRoleArn?: string;
@@ -116,7 +116,7 @@ ecs:
   tags:
     customer: You
     owner: Me
-  disableELB: false
+  albDisabled: false
   services:
   - name: example-name
     cpu: 512

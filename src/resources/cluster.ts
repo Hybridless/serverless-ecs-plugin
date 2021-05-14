@@ -3,7 +3,6 @@ import {VPC} from "./vpc";
 import {Service} from "./service";
 import {LoadBalancer} from './loadBalancer';
 import {NamePostFix, Resource} from "../resource";
-import { Protocol } from "./protocol";
 
 export class Cluster extends Resource<IClusterOptions> {
 
@@ -40,13 +39,7 @@ export class Cluster extends Resource<IClusterOptions> {
         return outputs;
     }
 
-    public getVPC(): VPC {
-        return this.vpc;
-    }
-
-    public isPublic(): boolean {
-        return this.options.public;
-    }
+    public getVPC(): VPC { return this.vpc; }
 
     public isSharedCluster(): boolean {
         return !!(this.options.clusterArns && this.options.clusterArns.ecsClusterArn && this.options.clusterArns.ecsClusterArn != 'null' && 
