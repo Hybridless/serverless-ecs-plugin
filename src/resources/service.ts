@@ -141,8 +141,8 @@ export class Service extends Resource<IServiceOptions> {
                             "Memory": this.options.memory,
                             "Image": this.options.image || `${this.options.imageRepository}:${this.options.name}-${this.options.imageTag}`,
                             ...(this.options.entryPoint ? { "EntryPoint": this.options.entryPoint } : {}),
-                            ...(this.cluster.getOptions().albDisabled || !this.ports//|| this.options.doNotAlbAttach -- i guess we can have port exposes on the local network
-                                    ? {} : {"PortMappings": [{ "ContainerPort": this.ports[0] }]}
+                            ...(!this.ports//|| this.options.doNotAlbAttach -- i guess we can have port exposes on the local network
+                                    ? {} : {"PortMappings": this.ports.map((port) => ({ "ContainerPort": port }))}
                                 ),
                             "LogConfiguration": {
                                 "LogDriver": "awslogs",
