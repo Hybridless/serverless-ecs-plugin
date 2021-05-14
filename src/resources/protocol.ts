@@ -78,7 +78,7 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
             rules.forEach((p, index) => {
                 _retRules = {
                     ..._retRules,
-                    ...this.generateListenerRule((p.path || p), index, p.method)
+                    ...this.generateListenerRule((p.path || p), index, p.method, p.priority)
                 };
             });
             return _retRules;
@@ -86,7 +86,7 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
             return this.generateListenerRule('*', 0);
         }
     }
-    private generateListenerRule(path: string, index: number, method?: string): any {
+    private generateListenerRule(path: string, index: number, method?: string, priority?: number): any {
         const usingAuthorizer: boolean = !!(this.options.protocol == 'HTTPS' && this.options.authorizer);
         return {
             [`${this.getName(NamePostFix.LOAD_BALANCER_LISTENER_RULE)}${index}`]: {
@@ -143,8 +143,8 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
                             return {
                                 "Field": "http-header",
                                 "HttpHeaderConfig": {
-                                    "HttpHeaderName": obj.Name,
-                                    "Values": (Array.isArray(obj.Value) ? obj.Value : [obj.Value])
+                                    "HttpHeaderName": obj.name,
+                                    "Values": (Array.isArray(obj.value) ? obj.value : [obj.value])
                                 }    
                             }
                         }) : []),
@@ -152,7 +152,7 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
                     "ListenerArn": (this.cluster.getOptions().elbListenerArn || {
                         "Ref": this.cluster.loadBalancer.getName(NamePostFix.LOAD_BALANCER_LISTENER) + this.port
                     }),
-                    "Priority": (this.cluster.getOptions().elbListenerArn ? this.service.getOptions().priority : this.cluster.getServiceListenerPriority(this.service, this))
+                    "Priority": (priority || 1)
                 }
             }
         }

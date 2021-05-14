@@ -35,10 +35,9 @@ export interface IServiceOptions {
     port?: number; // docker port (the port exposed on the docker image) - if not specified random port will be used - usefull for busy private subnets 
     hostname?: string | string[]; //optional hostname for filter on ELB 
     limitSourceIPs?: string | string[]; //optional limit source IPs on ELB
-    limitHeaders?: { Name: string, Value: string | string[] }[]; //optional limit headers on ELB
+    limitHeaders?: { name: string, value: string | string[] }[]; //optional limit headers on ELB
     protocols: IServiceProtocolOptions[];
-    priority?: number; // priority for routing, defaults to 1
-    path?: string | { path: string, method?: string }[]; // path the LB should send traffic to, defaults '*' (everything)
+    path?: string | { path: string, method?: string, priority: number }[]; // path the LB should send traffic to, defaults '*' (everything) nad users priority 1 on the ALB
     healthCheckUri?: string; // defaults to "/"
     healthCheckProtocol?: string; // defaults to "HTTP"
     healthCheckInterval?: number // in seconds, defaults to 6 seconds
