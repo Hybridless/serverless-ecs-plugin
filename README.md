@@ -1,6 +1,8 @@
 # serverless-ecs-plugin ![Node.js Package](https://github.com/hybridless/serverless-ecs-plugin/workflows/Node.js%20Package/badge.svg)
 
-Based on templates found here: https://github.com/nathanpeck/aws-cloudformation-fargate
+> **⚠ WARNING: Plugin under initial development .**  
+> Exceptions, breaking changes and malfunctioning is expected til 0.1.0 is reached
+> Documentation is also not up to date.
 
 ### Overall
 
