@@ -50,8 +50,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
         let secGroups = [];
         this.cluster.services.forEach((service: Service) => {
             //service has alb enabled and is public
-            if (service.ports && !this.cluster.getOptions().albDisabled && !service.getOptions().doNotAlbAttach && 
-                !this.cluster.getOptions().albPrivate) {
+            if (!this.cluster.getOptions().albDisabled && service.listeners.find((l) => l.isALBListenerEnabled())) {
                 secGroups.push({ "Ref": this.getSecurityGroupNameByService(service) });
             }
         });
@@ -83,7 +82,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
 
     private generateSecurityGroupsByService(service: Service): any {
         //check if alb is enabled for this service
-        if (!service.ports || this.cluster.getOptions().albDisabled || service.getOptions().doNotAlbAttach) return {};
+        if (this.cluster.getOptions().albDisabled || !service.listeners.find((l) => l.isALBListenerEnabled())) return {};
         const ALBServiceSecGroup = this.getSecurityGroupNameByService(service);
         return {
             //Public security groups
@@ -141,7 +140,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
             const defaultService = listener.services[0];
             listeners = {
                 ...listeners,
-                [this.getName(NamePostFix.LOAD_BALANCER_LISTENER)+listener.proto.port]: {
+                [this.getName(NamePostFix.LOAD_BALANCER_LISTENER) + listener.listener.port]: {
                     "Type": "AWS::ElasticLoadBalancingV2::Listener",
                     "DeletionPolicy": "Delete",
                     "DependsOn": [
@@ -150,17 +149,17 @@ export class LoadBalancer extends Resource<IClusterOptions> {
                     "Properties": {
                         "DefaultActions": [{ //Note: this is just the default, no biggie
                             "TargetGroupArn": {
-                                "Ref": defaultService.getName(NamePostFix.TARGET_GROUP)
+                                "Ref": defaultService.getName(NamePostFix.TARGET_GROUP) + listener.listener.port
                             },
                             "Type": "forward"
                         }],
                         "LoadBalancerArn": {
                             "Ref": this.getName(NamePostFix.LOAD_BALANCER)
                         },
-                        "Port": listener.proto.port,
-                        "Protocol": listener.proto.getOptions().protocol,
-                        ...(listener.proto.getOptions().protocol == "HTTPS" ? {
-                            "Certificates": listener.proto.getOptions().certificateArns.map((certificateArn: string): any => ({
+                        "Port": listener.listener.port,
+                        "Protocol": listener.listener.getOptions().protocol,
+                        ...(listener.listener.getOptions().protocol == "HTTPS" ? {
+                            "Certificates": listener.listener.getOptions().certificateArns.map((certificateArn: string): any => ({
                                 "CertificateArn": certificateArn
                             }))} : {}
                         )
@@ -175,14 +174,14 @@ export class LoadBalancer extends Resource<IClusterOptions> {
         //This is not allowed, better to explicty deny it rather than creating confusion os misconfigured systems
         let mappings = {};
         for (let service of this.cluster.services) {
-            for (let proto of service.protocols) {
-                if (mappings[proto.port]) {
-                    if (mappings[proto.port].proto.getOptions().protocol != proto.getOptions().protocol) {
-                        throw new Error(`Serverless: ecs-plugin: Service ${service.getOptions().name} on cluster ${this.cluster.getName(NamePostFix.CLUSTER)}, protocol ${proto.getOptions().protocol} is colliding with different service at same cluster on port ${proto.port}. Can't continue!`);
+            for (let listener of service.listeners) {
+                if (!listener.getOptions().albProtocol) continue;
+                if (mappings[listener.port]) {
+                    if (mappings[listener.port].proto.getOptions().albProtocol != listener.getOptions().albProtocol) {
+                        throw new Error(`Serverless: ecs-plugin: Service ${service.getOptions().name} on cluster ${this.cluster.getName(NamePostFix.CLUSTER)}, listener ${listener.getOptions().albProtocol} is colliding with different service at same cluster on port ${listener.port}. Can't continue!`);
                     }
-                    mappings[proto.port].services.push(service);
-                    //TODO: create error if using shared ecs, ports should be dynamically found
-                } else mappings[proto.port] = { proto, services: [service]};
+                    mappings[listener.port].services.push(service);
+                } else mappings[listener.port] = { listener, services: [service]};
             }
         }
         return mappings;

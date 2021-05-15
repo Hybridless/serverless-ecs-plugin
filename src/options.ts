@@ -24,19 +24,17 @@ export interface IClusterOptions {
 }
 
 //Service/Task (1:1 here)
-export interface IServiceOptions {
+export type IServiceOptions = {
     name: string;
     environment?: { [key: string]: (string | object )};
     propagateTags?: PropagateTagsType; //defaults to off
     //ASG
     autoScale?: IServiceAutoScalingOptions;
     //Load balancer
-    doNotAlbAttach?: boolean; //useful for disabling ALB listeners on a cluster that has ALB and more tasks with ALB enabled
-    port?: number | false; // docker port (the port exposed on the docker image) - if not specified random port will be used - usefull for busy private subnets -- false will disable the ports completly
     hostname?: string | string[]; //optional hostname for filter on ALB 
     limitSourceIPs?: string | string[]; //optional limit source IPs on ALB
     limitHeaders?: { name: string, value: string | string[] }[]; //optional limit headers on ALB
-    protocols: IServiceProtocolOptions[];
+    listeners?: IServiceListener[];
     path?: string | { path: string, method?: string, priority: number }[]; // path the LB should send traffic to, defaults '*' (everything) nad users priority 1 on the ALB
     healthCheckUri?: string; // defaults to "/"
     healthCheckProtocol?: string; // defaults to "HTTP"
@@ -51,15 +49,8 @@ export interface IServiceOptions {
     //concurrency and task configurations
     desiredCount?: number; // defaults to 1
     ec2LaunchType?: boolean; //defaults to false, if true will laucnh task into EC2
-    daemonEc2Type?: boolean; //default to false, and only considered when ec2LaunchType is true
     cpu: number;
     memory: number;
-    //ec2
-    placementConstraints?: { expression: string, type: 'distinctInstance' | 'memberOf' }[];
-    placementStrategies?: { field: 'string', type: 'binpack' | 'random' | 'spread' }[];
-    capacityProviderStrategy?: { base: number, capacityProvider: string, weight: number }[];
-    //fargate
-    enablePublicIPAssign?: boolean; //only used on fargate (not in ec2)
     //docker images
     image?: string;
     entryPoint?: string[]; //custom container entry point
@@ -69,6 +60,18 @@ export interface IServiceOptions {
     schedulerRate?: string; //creates event rule to invoke task the concurrency below or if not specified it will use 1
     schedulerConcurrency?: number;
     schedulerInput?: any;
+} & ( IServiceEC2Options | IServiceFargateOptions );
+//
+export interface IServiceEC2Options {
+    ec2LaunchType: true;
+    daemonEc2Type?: boolean; //default to false, and only considered when ec2LaunchType is true
+    placementConstraints?: { expression: string, type: 'distinctInstance' | 'memberOf' }[];
+    placementStrategies?: { field: 'string', type: 'binpack' | 'random' | 'spread' }[];
+    capacityProviderStrategy?: { base: number, capacityProvider: string, weight: number }[];
+};
+export interface IServiceFargateOptions {
+    ec2LaunchType: false | undefined;
+    enablePublicIPAssign?: boolean; //only used on fargate (not in ec2)
 }
 
 //VPC
@@ -85,15 +88,24 @@ export interface IVPCOptions_Shared {
 };
 
 //Service Protocol (alb listener)
-export interface IServiceProtocolOptions {
-    protocol: "HTTP" | "HTTPS";
+export type IServiceListener = {
     certificateArns?: string[]; // needed for https
     authorizer?: {
         poolArn: string;
         clientId: string;
         poolDomain: string;
     }; //available on HTTPS only
-}
+} & (
+    {
+        albProtocol: "HTTP" | "HTTPS"; //dictitates if service will be attached to ALB or not
+        port?: number; 
+    }
+     |
+    {
+        albProtocol?: "HTTP" | "HTTPS"; //dictitates if service will be attached to ALB or not
+        port: number;
+    }
+)
 
 //ASG
 export enum AutoScalingMetricType {

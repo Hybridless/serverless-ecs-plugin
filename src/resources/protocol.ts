@@ -1,9 +1,9 @@
 import {NamePostFix, Resource} from "../resource";
-import {IServiceProtocolOptions} from "../options";
+import {IServiceListener} from "../options";
 import {Service} from "./service";
 import {Cluster} from "./cluster";
 
-export class Protocol extends Resource<IServiceProtocolOptions> {
+export class Protocol extends Resource<IServiceListener> {
 
     private readonly cluster: Cluster;
     private readonly service: Service;
@@ -12,7 +12,7 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
     public constructor(cluster: Cluster,
                        service: Service,
                        stage: string,
-                       options: IServiceProtocolOptions, 
+                       options: IServiceListener, 
                        port: number,
                        tags?: object) {
         super(options, stage, service.getNamePrefix(), tags);
@@ -22,23 +22,27 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
     }
 
     public getName(namePostFix: NamePostFix): string {
-        return super.getName(namePostFix) + this.options.protocol.toUpperCase();
+        return super.getName(namePostFix) + (this.options.albProtocol ? this.options.albProtocol.toUpperCase : '') + (this.options.port || '');
+    }
+
+    public isALBListenerEnabled(): boolean {
+        return !!(!this.cluster.getOptions().albDisabled && this.getOptions().albProtocol);
     }
 
     public getOutputs(): any {
         //do not generate output if no load balancer is created by us
-        if (this.cluster.getOptions().albListenerArn) return {};
+        if (this.cluster.getOptions().albListenerArn || !this.isALBListenerEnabled()) return {};
         return {
-            [this.service.getName(NamePostFix.SERVICE) + this.options.protocol]: {
+            [this.service.getName(NamePostFix.SERVICE) + this.options.albProtocol]: {
                 "Description": "Elastic load balancer service endpoint",
                 "Export": {
-                    "Name": this.service.getName(NamePostFix.SERVICE) + this.options.protocol
+                    "Name": this.service.getName(NamePostFix.SERVICE) + this.options.albProtocol.toUpperCase + (this.options.port || '')
                 },
                 "Value": {
                     "Fn::Join": [
                         "",
                         [
-                            this.options.protocol.toLowerCase(),
+                            this.options.albProtocol.toLowerCase(),
                             "://",
                             { "Fn::GetAtt": [this.cluster.loadBalancer.getName(NamePostFix.LOAD_BALANCER), "DNSName"] },
                             ":",
@@ -51,11 +55,12 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
     }
 
     public generate(): any {
-        if (this.options.protocol === "HTTPS" && (!this.options.certificateArns || this.options.certificateArns.length === 0)) {
+        if (this.options.albProtocol === "HTTPS" && (!this.options.certificateArns || this.options.certificateArns.length === 0)) {
             throw new Error('Certificate ARN required for HTTPS');
         }
-        return this.getListenerRules();
+        return this.generateListenerRules();
     }
+
     public getListenerRulesName(): string[] {
         if (typeof this.service.getOptions().path === 'string') {
             return [`${this.getName(NamePostFix.LOAD_BALANCER_LISTENER_RULE)}${0}`];
@@ -68,7 +73,11 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
             return [`${this.getName(NamePostFix.LOAD_BALANCER_LISTENER_RULE)}${0}`];
         }
     }
-    protected getListenerRules(): any {
+
+
+    
+    /* Resources */
+    private generateListenerRules(): any {
         if (typeof this.service.getOptions().path === 'string') {
             const path: any = this.service.getOptions().path;
             return this.generateListenerRule(path, 0);
@@ -87,7 +96,7 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
         }
     }
     private generateListenerRule(path: string, index: number, method?: string, priority?: number): any {
-        const usingAuthorizer: boolean = !!(this.options.protocol == 'HTTPS' && this.options.authorizer);
+        const usingAuthorizer: boolean = !!(this.options.albProtocol == 'HTTPS' && this.options.authorizer);
         return {
             [`${this.getName(NamePostFix.LOAD_BALANCER_LISTENER_RULE)}${index}`]: {
                 "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
@@ -105,7 +114,7 @@ export class Protocol extends Resource<IServiceProtocolOptions> {
                         }] : []),
                         {
                             "TargetGroupArn": {
-                                "Ref": this.service.getName(NamePostFix.TARGET_GROUP)
+                                "Ref": this.service.getName(NamePostFix.TARGET_GROUP) + this.options.port
                             },
                             "Type": "forward",
                             ...(usingAuthorizer ? {"Order": 2} : {})
