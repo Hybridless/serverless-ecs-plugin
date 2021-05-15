@@ -1,7 +1,7 @@
 # serverless-ecs-plugin ![Node.js Package](https://github.com/hybridless/serverless-ecs-plugin/workflows/Node.js%20Package/badge.svg)
 
 > **⚠ WARNING: Plugin under initial development .**  
-> Exceptions, breaking changes and malfunctioning is expected til 0.1.0 is reached
+> Exceptions, breaking changes and malfunctioning is expected til 0.1.0 is reach. \
 > Documentation is also not up to date.
 
 ### Overall
