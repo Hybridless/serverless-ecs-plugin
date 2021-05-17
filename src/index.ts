@@ -47,7 +47,7 @@ class ServerlessECSPlugin {
         const options: IClusterOptions[] = (this.serverless.pluginManager.serverlessConfigFile ? this.serverless.pluginManager.serverlessConfigFile.ecs : this.serverless.configurationInput.ecs);
         const stage: string = service.provider ? service.provider.stage : service.stage;
         const provider = this.serverless.getProvider(Globals.PluginDefaultProvider);
-        const serviceName: string = provider.naming.getNormalizedFunctionName(service.service);
+        const serviceName: string = provider.naming.getNormalizedFunctionName(service.service.replace(/-/g, ''));
         //No cluster section specified, don't process
         if (!options || !options.length) {
             console.error('serverless-ecs-plugin: Cluster will not be deployed due missing options.');
