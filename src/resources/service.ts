@@ -33,6 +33,7 @@ export class Service extends Resource<IServiceOptions> {
         this.logGroupName = `/aws/ecs/${this.cluster.getNamePrefix()}/${this.stage}/${options.name}`;
     }
 
+    /* Resource life-cycle */
     public generate(): any {
         const executionRole: any | undefined = this.cluster.getExecutionRoleArn() ? undefined : this.generateExecutionRole();
         return Object.assign(
@@ -43,10 +44,7 @@ export class Service extends Resource<IServiceOptions> {
             this.generateSchedulerEventRule(),
             ...this.listeners.map((listener: Protocol): any => {
                 if (listener.isALBListenerEnabled()) {
-                    return {
-                        ...listener.generate(),
-                        ...this.generateTargetGroup(listener)
-                    };
+                    return { ...listener.generate(), ...this.generateTargetGroup(listener) };
                 } else return {};
             }),
             this.generateAutoscaling(),

@@ -21,40 +21,14 @@ export class Cluster extends Resource<IClusterOptions> {
         this.loadBalancer = new LoadBalancer(stage, options, this, tags);
     }
 
-    /* Getters */
-    public getExecutionRoleArn(): string | undefined {
-        return this.options.executionRoleArn;
-    }
-
+    /* Resource life-cycle */
     public getOutputs(): any {
-        let outputs = {
-            ...this.loadBalancer.getOutputs()
-        };
+        let outputs = { ...this.loadBalancer.getOutputs() };
         this.services.forEach((service: Service) => {
-            outputs = {
-                ...outputs,
-                ...service.getOutputs()
-            }
+            outputs = { ...outputs, ...service.getOutputs() }
         });
         return outputs;
     }
-
-    public getVPC(): VPC { return this.vpc; }
-
-    public isSharedCluster(): boolean {
-        return !!(this.options.clusterArns && this.options.clusterArns.ecsClusterArn && this.options.clusterArns.ecsClusterArn != 'null' && 
-                  this.options.clusterArns.ecsIngressSecGroupId && this.options.clusterArns.ecsIngressSecGroupId != 'null');
-    }
-
-    public getClusterRef(): any {
-        return (this.isSharedCluster() ? this.options.clusterArns.ecsClusterArn : { "Ref": this.getName(NamePostFix.CLUSTER) } )
-    }
-
-    public getClusterIngressSecGroup(): any {
-        return (this.isSharedCluster() ? this.options.clusterArns.ecsIngressSecGroupId : { "Ref": this.getName(NamePostFix.CONTAINER_SECURITY_GROUP) });
-    }
-
-    /* Cloud Formation generation */
     public generate(): any {
         // generate the defs for each service
         const defs: any[] = this.services.map((service: Service): any => service.generate());
@@ -75,6 +49,21 @@ export class Cluster extends Resource<IClusterOptions> {
         }, ...defs);
     }
 
+    /* Public Getters */
+    public getExecutionRoleArn(): string | undefined { return this.options.executionRoleArn; }
+    public getVPC(): VPC { return this.vpc; }
+    public isSharedCluster(): boolean {
+        return !!(this.options.clusterArns && this.options.clusterArns.ecsClusterArn && this.options.clusterArns.ecsClusterArn != 'null' &&
+            this.options.clusterArns.ecsIngressSecGroupId && this.options.clusterArns.ecsIngressSecGroupId != 'null');
+    }
+    public getClusterRef(): any {
+        return (this.isSharedCluster() ? this.options.clusterArns.ecsClusterArn : { "Ref": this.getName(NamePostFix.CLUSTER) })
+    }
+    public getClusterIngressSecGroup(): any {
+        return (this.isSharedCluster() ? this.options.clusterArns.ecsIngressSecGroupId : { "Ref": this.getName(NamePostFix.CONTAINER_SECURITY_GROUP) });
+    }
+
+    /* Private */
     private getClusterSecurityGroups(): any {
         if (this.getVPC().useExistingVPC()) { return {}; } //No security group resource is required
         else {

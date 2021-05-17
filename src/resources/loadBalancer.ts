@@ -14,8 +14,8 @@ export class LoadBalancer extends Resource<IClusterOptions> {
         this.cluster = cluster;
     }
 
+    /* Resource life-cycle */
     public getOutputs(): any { return {}; }
-
     public generate(): any {
         return Object.assign({
             ...(this.options.albDisabled ? {} : {
@@ -33,7 +33,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
                                     "Value": (this.options.timeout || 30)
                                 }
                             ],
-                            "Subnets": this.cluster.getVPC().getSubnets(),
+                            "Subnets": this.cluster.getVPC().getALBSubnets(),
                             "SecurityGroups": this.getALBSecurityGroupsRef()
                         },
                     },

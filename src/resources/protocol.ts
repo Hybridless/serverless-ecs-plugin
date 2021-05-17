@@ -21,14 +21,7 @@ export class Protocol extends Resource<IServiceListener> {
         this.port = port;
     }
 
-    public getName(namePostFix: NamePostFix): string {
-        return super.getName(namePostFix) + (this.options.albProtocol ? this.options.albProtocol.toUpperCase : '') + (this.options.port || '');
-    }
-
-    public isALBListenerEnabled(): boolean {
-        return !!(!this.cluster.getOptions().albDisabled && this.getOptions().albProtocol);
-    }
-
+    /* Resource life-cycle */
     public getOutputs(): any {
         //do not generate output if no load balancer is created by us
         if (this.cluster.getOptions().albListenerArn || !this.isALBListenerEnabled()) return {};
@@ -53,7 +46,6 @@ export class Protocol extends Resource<IServiceListener> {
             }
         };
     }
-
     public generate(): any {
         if (this.options.albProtocol === "HTTPS" && (!this.options.certificateArns || this.options.certificateArns.length === 0)) {
             throw new Error('Certificate ARN required for HTTPS');
@@ -61,6 +53,14 @@ export class Protocol extends Resource<IServiceListener> {
         return this.generateListenerRules();
     }
 
+    /* Public getters */
+    public getName(namePostFix: NamePostFix): string {
+        return super.getName(namePostFix) + (this.options.albProtocol ? this.options.albProtocol.toUpperCase : '') + (this.options.port || '');
+    }
+
+    public isALBListenerEnabled(): boolean {
+        return !!(!this.cluster.getOptions().albDisabled && this.getOptions().albProtocol);
+    }
     public getListenerRulesName(): string[] {
         if (typeof this.service.getOptions().path === 'string') {
             return [`${this.getName(NamePostFix.LOAD_BALANCER_LISTENER_RULE)}${0}`];
@@ -74,8 +74,6 @@ export class Protocol extends Resource<IServiceListener> {
         }
     }
 
-
-    
     /* Resources */
     private generateListenerRules(): any {
         if (typeof this.service.getOptions().path === 'string') {

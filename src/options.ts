@@ -85,6 +85,7 @@ export interface IVPCOptions_Shared {
     vpcId: string;
     securityGroupIds: string[];
     subnetIds: string[];
+    albSubnetIds?: string[];
 };
 
 //Service Protocol (alb listener)
