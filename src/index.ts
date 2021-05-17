@@ -15,7 +15,6 @@ class ServerlessECSPlugin {
     constructor(serverless: any, options: any) {
         this.serverless = serverless;
         // this.provider = 'aws';
-        this.hooks = { 'package:compileFunctions': this.compile.bind(this) };
         //Commands
         this.commands = {
             'serverless-ecs-plugin': {
@@ -31,11 +30,11 @@ class ServerlessECSPlugin {
         //Hooks
         this.hooks = {
             // Cmds
-            'serverless-ecs-plugin:compile:compile': () => Promise.bind(this).then(this.compile), //0
+            'serverless-ecs-plugin:compile:compile': () => this.compile.bind(this), //0
             // Real hooks
-            'package:compileFunctions': () => {
+            'deploy:compileFunctions': () => {
                 return Promise.bind(this)
-                    .then(() => this.serverless.pluginManager.spawn('serverless-ecs-plugin:compile:compile'))
+                    .then(() => this.serverless.pluginManager.spawn('serverless-ecs-plugin:compile'))
             }
         };
         //Schema

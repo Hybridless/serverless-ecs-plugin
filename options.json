@@ -784,7 +784,6 @@
               },
               "required": [
                 "cpu",
-                "ec2LaunchType",
                 "memory",
                 "name"
               ],

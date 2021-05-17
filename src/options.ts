@@ -70,7 +70,7 @@ export interface IServiceEC2Options {
     capacityProviderStrategy?: { base: number, capacityProvider: string, weight: number }[];
 };
 export interface IServiceFargateOptions {
-    ec2LaunchType: false | undefined;
+    ec2LaunchType?: false | undefined;
     enablePublicIPAssign?: boolean; //only used on fargate (not in ec2)
 }
 
