@@ -24,6 +24,8 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
 
 #### Options
 ```javascript
+  [serverless.yml content]
+  ....
   ecs: Array<{
     //Misc
     tags: {
