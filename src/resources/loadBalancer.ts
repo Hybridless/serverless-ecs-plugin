@@ -157,8 +157,8 @@ export class LoadBalancer extends Resource<IClusterOptions> {
                             "Ref": this.getName(NamePostFix.LOAD_BALANCER)
                         },
                         "Port": listener.listener.port,
-                        "Protocol": listener.listener.getOptions().protocol,
-                        ...(listener.listener.getOptions().protocol == "HTTPS" ? {
+                        "Protocol": listener.listener.getOptions().albProtocol || 'HTTP',
+                        ...(listener.listener.getOptions().albProtocol == "HTTPS" ? {
                             "Certificates": listener.listener.getOptions().certificateArns.map((certificateArn: string): any => ({
                                 "CertificateArn": certificateArn
                             }))} : {}
