@@ -26,7 +26,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
                         "Properties": {
                             "Name": this.getName(NamePostFix.LOAD_BALANCER),
                             ...(this.getTags() ? { "Tags": this.getTags() } : {}),
-                            "Scheme": (this.options.albPrivate ? "internet-facing" : "internal"),
+                            "Scheme": (this.options.albPrivate ? "internal" : "internet-facing"),
                             "LoadBalancerAttributes": [
                                 {
                                     "Key": "idle_timeout.timeout_seconds",
@@ -137,7 +137,7 @@ export class LoadBalancer extends Resource<IClusterOptions> {
         let listeners = {};
         Object.keys(aggServices).forEach( (listenerKey) => {
             const listener = aggServices[listenerKey];
-            if (listener.isALBListenerEnabled()) {
+            if (listener.listener.isALBListenerEnabled()) {
                 const defaultService = listener.services[0];
                 listeners = {
                     ...listeners,
