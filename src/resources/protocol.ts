@@ -23,20 +23,19 @@ export class Protocol extends Resource<IServiceListener> {
 
     /* Resource life-cycle */
     public getOutputs(): any {
-        const protocol = this.options.albProtocol || 'HTTP';
         //do not generate output if no load balancer is created by us
         if (this.cluster.getOptions().albListenerArn || !this.isALBListenerEnabled()) return {};
         return {
-            [this.service.getName(NamePostFix.SERVICE) + protocol]: {
+            [this.service.getName(NamePostFix.SERVICE) + this.options.albProtocol]: {
                 "Description": "Elastic load balancer service endpoint",
                 "Export": {
-                    "Name": this.service.getName(NamePostFix.SERVICE) + protocol.toUpperCase() + (this.options.port || '')
+                    "Name": this.service.getName(NamePostFix.SERVICE) + this.options.albProtocol.toUpperCase() + (this.options.port || '')
                 },
                 "Value": {
                     "Fn::Join": [
                         "",
                         [
-                            protocol.toLowerCase(),
+                            this.options.albProtocol.toLowerCase(),
                             "://",
                             { "Fn::GetAtt": [this.cluster.loadBalancer.getName(NamePostFix.LOAD_BALANCER), "DNSName"] },
                             ":",
@@ -56,11 +55,11 @@ export class Protocol extends Resource<IServiceListener> {
 
     /* Public getters */
     public getName(namePostFix: NamePostFix): string {
-        return super.getName(namePostFix) + (this.options.albProtocol ? this.options.albProtocol.toUpperCase() : 'HTTP') + (this.options.port || '');
+        return super.getName(namePostFix) + (this.options.albProtocol ? this.options.albProtocol.toUpperCase() : '') + (this.options.port || '');
     }
 
     public isALBListenerEnabled(): boolean {
-        return !!(!this.cluster.getOptions().albDisabled && (this.getOptions().albProtocol || this.getOptions().port));
+        return !!(!this.cluster.getOptions().albDisabled && this.getOptions().albProtocol);
     }
     public getListenerRulesName(): string[] {
         if (typeof this.service.getOptions().path === 'string') {

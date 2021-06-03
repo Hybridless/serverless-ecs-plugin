@@ -71,7 +71,7 @@ export interface IServiceEC2Options {
 };
 export interface IServiceFargateOptions {
     ec2LaunchType?: false | undefined;
-    enablePublicIPAssign?: boolean; //only used on fargate (not in ec2)
+    disablePublicIPAssign?: boolean; //only used on fargate (not in ec2)
 }
 
 //VPC

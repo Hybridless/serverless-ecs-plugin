@@ -507,13 +507,13 @@
                 "desiredCount": {
                   "type": "number"
                 },
+                "disablePublicIPAssign": {
+                  "type": "boolean"
+                },
                 "ec2LaunchType": {
                   "enum": [
                     false
                   ],
-                  "type": "boolean"
-                },
-                "enablePublicIPAssign": {
                   "type": "boolean"
                 },
                 "entryPoint": {

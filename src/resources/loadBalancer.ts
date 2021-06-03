@@ -137,35 +137,38 @@ export class LoadBalancer extends Resource<IClusterOptions> {
         let listeners = {};
         Object.keys(aggServices).forEach( (listenerKey) => {
             const listener = aggServices[listenerKey];
-            const defaultService = listener.services[0];
-            listeners = {
-                ...listeners,
-                [this.getName(NamePostFix.LOAD_BALANCER_LISTENER) + listener.listener.port]: {
-                    "Type": "AWS::ElasticLoadBalancingV2::Listener",
-                    "DeletionPolicy": "Delete",
-                    "DependsOn": [
-                        this.getName(NamePostFix.LOAD_BALANCER)
-                    ],
-                    "Properties": {
-                        "DefaultActions": [{ //Note: this is just the default, no biggie
-                            "TargetGroupArn": {
-                                "Ref": defaultService.getName(NamePostFix.TARGET_GROUP) + listener.listener.port
+            if (listener.isALBListenerEnabled()) {
+                const defaultService = listener.services[0];
+                listeners = {
+                    ...listeners,
+                    [this.getName(NamePostFix.LOAD_BALANCER_LISTENER) + listener.listener.port]: {
+                        "Type": "AWS::ElasticLoadBalancingV2::Listener",
+                        "DeletionPolicy": "Delete",
+                        "DependsOn": [
+                            this.getName(NamePostFix.LOAD_BALANCER)
+                        ],
+                        "Properties": {
+                            "DefaultActions": [{ //Note: this is just the default, no biggie
+                                "TargetGroupArn": {
+                                    "Ref": defaultService.getName(NamePostFix.TARGET_GROUP) + listener.listener.port
+                                },
+                                "Type": "forward"
+                            }],
+                            "LoadBalancerArn": {
+                                "Ref": this.getName(NamePostFix.LOAD_BALANCER)
                             },
-                            "Type": "forward"
-                        }],
-                        "LoadBalancerArn": {
-                            "Ref": this.getName(NamePostFix.LOAD_BALANCER)
-                        },
-                        "Port": listener.listener.port,
-                        "Protocol": listener.listener.getOptions().albProtocol || 'HTTP',
-                        ...(listener.listener.getOptions().albProtocol == "HTTPS" ? {
-                            "Certificates": listener.listener.getOptions().certificateArns.map((certificateArn: string): any => ({
-                                "CertificateArn": certificateArn
-                            }))} : {}
-                        )
+                            "Port": listener.listener.port,
+                            "Protocol": listener.listener.getOptions().albProtocol,
+                            ...(listener.listener.getOptions().albProtocol == "HTTPS" ? {
+                                "Certificates": listener.listener.getOptions().certificateArns.map((certificateArn: string): any => ({
+                                    "CertificateArn": certificateArn
+                                }))
+                            } : {}
+                            )
+                        }
                     }
-                }
-            };
+                };
+            }
         });
         return listeners;
     }

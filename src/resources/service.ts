@@ -26,7 +26,7 @@ export class Service extends Resource<IServiceOptions> {
         this.listeners = this.options.listeners.map((listener: IServiceListener, index): any => {
             //use specified port for the first protocol
             const port = (listener.port || (listener.albProtocol ? (listener.albProtocol == 'HTTP' ? 80 : 443) : (Math.floor(Math.random() * 49151) + 1024)));
-            console.debug(`Serverless: ecs-plugin: Using port ${port} for service ${options.name} on cluster ${cluster.getName(NamePostFix.CLUSTER)} - ALB is ${listener.albProtocol || 'HTTP' ? `enabled with protocol: ${listener.albProtocol}` : 'is not enabled!'}`);
+            console.debug(`Serverless: ecs-plugin: Using port ${port} for service ${options.name} on cluster ${cluster.getName(NamePostFix.CLUSTER)} - ALB is ${listener.albProtocol ? `enabled with protocol: ${listener.albProtocol}` : 'is not enabled!'}`);
             return new Protocol(cluster, this, stage, listener, port, tags);
         });
         //we do not use UID on log group name because we want to persist logs from one deployment to another
@@ -105,7 +105,7 @@ export class Service extends Resource<IServiceOptions> {
                     "DesiredCount": (this.options.desiredCount ? this.options.desiredCount : 1),
                     ...(!this.options.ec2LaunchType ? {"NetworkConfiguration": {
                         "AwsvpcConfiguration": {
-                            "AssignPublicIp": ((this.options as IServiceFargateOptions).enablePublicIPAssign ? "ENABLED" : "DISABLED"),
+                            "AssignPublicIp": ((this.options as IServiceFargateOptions).disablePublicIPAssign ? "DISABLED" : "ENABLED"),
                             "SecurityGroups": this.getSecurityGroups(),
                             "Subnets": this.cluster.getVPC().getSubnets()
                         }
@@ -191,7 +191,7 @@ export class Service extends Resource<IServiceOptions> {
                     ...(this.getTags() ? { "Tags": this.getTags() } : {}),
                     "HealthCheckIntervalSeconds": this.options.healthCheckInterval ? this.options.healthCheckInterval : 6,
                     "HealthCheckPath": this.options.healthCheckUri ? this.options.healthCheckUri : "/",
-                    "HealthCheckProtocol": listener.getOptions().albProtocol || 'HTTP',
+                    "HealthCheckProtocol": listener.getOptions().albProtocol,
                     "HealthCheckTimeoutSeconds": this.options.healthCheckTimeout ? this.options.healthCheckTimeout : 5,
                     "HealthyThresholdCount": this.options.healthCheckHealthyCount ? this.options.healthCheckHealthyCount : 2,
                     "TargetType": (this.options.ec2LaunchType ? "instance" : "ip"),
