@@ -56,9 +56,9 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
         //VPC as described above -- All vpc parameters below are intrinsic safe 
         //ivars meaning that all of then accept intrinsic functions 💪
         vpcId: string;
-        securityGroupIds: string[]
-        subnetIds: string[]
-        albSubnetIds?: string[]; //this will superseed subnetsIds for the ALB if specified
+        securityGroupIds: string[] | any;  //object allows intrinsict functions
+        subnetIds: string[] | any;  //object allows intrinsict functions
+        albSubnetIds?: string[] | object; //object allows intrinsict functions -- will superseed subnetsIds for the ALB if specified
     };
     //Services/tasks (1:1)
     services: Array<{

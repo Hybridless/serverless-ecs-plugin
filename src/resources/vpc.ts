@@ -43,8 +43,8 @@ export class VPC extends Resource<IVPCOptions> {
             "Ref": subnet
         })));
     }
-    public getALBSubnets(): any[] {
-        return ((this.useExistingVPC() && (this.options as IVPCOptions_Shared).albSubnetIds.length > 0) ? (this.options as IVPCOptions_Shared).albSubnetIds : this.getSubnets());
+    public getALBSubnets(): any {
+        return ((this.useExistingVPC() && (this.options as IVPCOptions_Shared).albSubnetIds) ? (this.options as IVPCOptions_Shared).albSubnetIds : this.getSubnets());
     }
 
     /* self created VPC */

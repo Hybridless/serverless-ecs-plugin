@@ -826,23 +826,22 @@
             "additionalProperties": false,
             "properties": {
               "albSubnetIds": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "properties": {},
+                    "type": "object"
+                  },
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                ]
               },
-              "securityGroupIds": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "subnetIds": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
+              "securityGroupIds": {},
+              "subnetIds": {},
               "vpcId": {
                 "type": "string"
               }
