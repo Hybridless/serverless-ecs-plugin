@@ -191,7 +191,7 @@ export class Service extends Resource<IServiceOptions> {
                     ...(this.getTags() ? { "Tags": this.getTags() } : {}),
                     "HealthCheckIntervalSeconds": this.options.healthCheckInterval ? this.options.healthCheckInterval : 6,
                     "HealthCheckPath": this.options.healthCheckUri ? this.options.healthCheckUri : "/",
-                    "HealthCheckProtocol": listener.getOptions().albProtocol,
+                    "HealthCheckProtocol": this.options.healthCheckProtocol || 'HTTP',
                     "HealthCheckTimeoutSeconds": this.options.healthCheckTimeout ? this.options.healthCheckTimeout : 5,
                     "HealthyThresholdCount": this.options.healthCheckHealthyCount ? this.options.healthCheckHealthyCount : 2,
                     "TargetType": (this.options.ec2LaunchType ? "instance" : "ip"),
