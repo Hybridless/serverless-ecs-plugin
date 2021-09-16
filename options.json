@@ -858,8 +858,7 @@
     },
     "required": [
       "clusterName",
-      "services",
-      "vpc"
+      "services"
     ],
     "type": "object"
   },

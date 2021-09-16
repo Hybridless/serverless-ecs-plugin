@@ -47,7 +47,7 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
     //IAM
     executionRoleArn?: string; // execution role for services, generated if not specified
     //VPC
-    vpc: {
+    vpc?: {
         //if this options are specified it will create a VPC
         cidr: string;
         subnets: string[]; // subnet cidrs

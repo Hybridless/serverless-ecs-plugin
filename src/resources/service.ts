@@ -23,12 +23,12 @@ export class Service extends Resource<IServiceOptions> {
         this.cluster = cluster;
         this.executionRole = `${cluster.getNamePrefix()}ECSServiceExecutionRole${this.stage}`;
         //Only generate protocols if needed
-        this.listeners = this.options.listeners.map((listener: IServiceListener, index): any => {
+        this.listeners = this.options.listeners?.map((listener: IServiceListener, index): any => {
             //use specified port for the first protocol
             const port = (listener.port || (listener.albProtocol ? (listener.albProtocol == 'HTTP' ? 80 : 443) : (Math.floor(Math.random() * 49151) + 1024)));
             console.debug(`Serverless: ecs-plugin: Using port ${port} for service ${options.name} on cluster ${cluster.getName(NamePostFix.CLUSTER)} - ALB is ${listener.albProtocol ? `enabled with protocol: ${listener.albProtocol}` : 'is not enabled!'}`);
             return new Protocol(cluster, this, stage, listener, port, tags);
-        });
+        }) || [];
         //we do not use UID on log group name because we want to persist logs from one deployment to another
         this.logGroupName = `/aws/ecs/${this.cluster.getNamePrefix()}/${this.stage}/${options.name}`;
     }

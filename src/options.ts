@@ -20,7 +20,7 @@ export interface IClusterOptions {
     //IAM
     executionRoleArn?: string; // role for services, generated if not specfied
     //VPC
-    vpc: IVPCOptions;
+    vpc?: IVPCOptions;
 }
 
 //Service/Task (1:1 here)
