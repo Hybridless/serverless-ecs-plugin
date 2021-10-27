@@ -86,7 +86,8 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
             //otherwise a random port will be attached to it
               //If not albProtocol is set, this port will not be attached to the ALB
             albProtocol?: "HTTP" | "HTTPS";
-            port?: number;
+            port?: number; // 443 for HTTPS
+            containerPort?: number; // Port of docker container, e.g. 8080
             //
             certificateArns?: string[]; // needed for https
             authorizer?: {

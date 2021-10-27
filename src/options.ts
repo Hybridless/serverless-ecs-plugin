@@ -100,11 +100,13 @@ export type IServiceListener = {
     {
         albProtocol: "HTTP" | "HTTPS"; //dictitates if service will be attached to ALB or not
         port?: number; 
+        containerPort?: number;
     }
      |
     {
         albProtocol?: "HTTP" | "HTTPS"; //dictitates if service will be attached to ALB or not
         port: number;
+        containerPort?: number;
     }
 )
 

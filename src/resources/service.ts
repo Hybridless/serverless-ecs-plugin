@@ -26,8 +26,9 @@ export class Service extends Resource<IServiceOptions> {
         this.listeners = this.options.listeners?.map((listener: IServiceListener, index): any => {
             //use specified port for the first protocol
             const port = (listener.port || (listener.albProtocol ? (listener.albProtocol == 'HTTP' ? 80 : 443) : (Math.floor(Math.random() * 49151) + 1024)));
-            console.debug(`Serverless: ecs-plugin: Using port ${port} for service ${options.name} on cluster ${cluster.getName(NamePostFix.CLUSTER)} - ALB is ${listener.albProtocol ? `enabled with protocol: ${listener.albProtocol}` : 'is not enabled!'}`);
-            return new Protocol(cluster, this, stage, listener, port, tags);
+            const containerPort = listener.containerPort || port;
+            console.debug(`Serverless: ecs-plugin: Using port ${port} and containerPort ${containerPort} for service ${options.name} on cluster ${cluster.getName(NamePostFix.CLUSTER)} - ALB is ${listener.albProtocol ? `enabled with protocol: ${listener.albProtocol}` : 'is not enabled!'}`);
+            return new Protocol(cluster, this, stage, listener, port, containerPort, tags);
         }) || [];
         //we do not use UID on log group name because we want to persist logs from one deployment to another
         this.logGroupName = `/aws/ecs/${this.cluster.getNamePrefix()}/${this.stage}/${options.name}`;
@@ -116,7 +117,7 @@ export class Service extends Resource<IServiceOptions> {
                     ...(this.listeners.find((l) => l.isALBListenerEnabled()) ? {
                         "LoadBalancers": this.listeners.filter((l) => l.isALBListenerEnabled()).map((l) => ({
                                 "ContainerName": this.getName(NamePostFix.CONTAINER_NAME),
-                                "ContainerPort": l.port,
+                                "ContainerPort": l.containerPort,
                                 "TargetGroupArn": { "Ref": this.getName(NamePostFix.TARGET_GROUP) + l.port }
                             }))
                     } : {}),
@@ -156,7 +157,7 @@ export class Service extends Resource<IServiceOptions> {
                             "Image": this.options.image || `${this.options.imageRepository}:${this.options.name}-${this.options.imageTag}`,
                             ...(this.options.entryPoint ? { "EntryPoint": this.options.entryPoint } : {}),
                             ...(this.listeners.length > 0 ? {
-                                "PortMappings": this.listeners.map((l) => ({ "ContainerPort": l.port }))
+                                "PortMappings": this.listeners.map((l) => ({ "ContainerPort": l.containerPort }))
                             } : {}),
                             "LogConfiguration": {
                                 "LogDriver": "awslogs",
@@ -196,7 +197,7 @@ export class Service extends Resource<IServiceOptions> {
                     "HealthyThresholdCount": this.options.healthCheckHealthyCount ? this.options.healthCheckHealthyCount : 2,
                     "TargetType": (this.options.ec2LaunchType ? "instance" : "ip"),
                     // "Name": this.getName(NamePostFix.TARGET_GROUP), -- should not be set - allow replacement
-                    "Port": listener.getOptions().port,
+                    "Port": listener.getOptions().containerPort || listener.getOptions().port,
                     "Protocol": "HTTP", //inside vpc we are theorically good, but HTTPS should be implement on the future for sure. TODO
                     "UnhealthyThresholdCount": this.options.healthCheckUnhealthyCount ? this.options.healthCheckUnhealthyCount : 2,
                     "VpcId": this.cluster.getVPC().getRefName()
