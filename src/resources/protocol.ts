@@ -14,11 +14,13 @@ export class Protocol extends Resource<IServiceListener> {
                        stage: string,
                        options: IServiceListener, 
                        port: number,
+                       containerPort: number,
                        tags?: object) {
         super(options, stage, service.getNamePrefix(), tags);
         this.cluster = cluster;
         this.service = service;
         this.port = port;
+        this.containerPort = containerPort;
     }
 
     /* Resource life-cycle */
