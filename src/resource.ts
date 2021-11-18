@@ -1,12 +1,12 @@
 export enum NamePostFix {
     CLUSTER = "Cluster",
-    CONTAINER_SECURITY_GROUP = "ContainerSecGroup",
+    CONTAINER_SECURITY_GROUP = "ECSServiceSecGroup",
     CONTAINER_NAME = "ContainerName",
     LOAD_BALANCER = "ALB",
     LOAD_BALANCER_SECURITY_GROUP = "ALBSecGroup",
     LOAD_BALANCER_LISTENER = "ALBListener",
     LOAD_BALANCER_LISTENER_RULE = "ALBListenerRule",
-    SECURITY_GROUP_INGRESS_ALB = "ALBSecGroupIngress",
+    SECURITY_GROUP_INGRESS_ALB = "ALBToECSSecGroupIngress",
     SECURITY_GROUP_INGRESS_SELF = "SecGroupIngressSelf",
     LOG_GROUP = "LogGroup",
 
