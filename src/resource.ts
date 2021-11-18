@@ -30,7 +30,7 @@ export enum NamePostFix {
     AutoScalingTarget = "ASTarget", 
     AutoScalingPolicy = "ASPolicy",
     AutoScalingPolicyIn = "ASPolicyIn",
-    AutoScalingPolicyInAlarm = "AutoScalingPolicyInAlarm",
+    AutoScalingPolicyInAlarm = "ASPolicyInAlarm",
     AutoScalingPolicyOut = "ASPolicyOut",
     AutoScalingPolicyOutAlarm = "ASPolicyOutAlarm"
 }

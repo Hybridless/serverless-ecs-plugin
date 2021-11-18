@@ -75,13 +75,13 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
               cooldownIn?: number; //defaults to cooldown but has priority over it
               cooldownOut?: number; //defaults to cooldown but has priority over it
               targetValue: number;
-              //Optional Custom metric
+              //Step based AS
               scaleIn?: {
                   adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
                   cooldown?: number; //default to 300
                   aggregation: 'Average' | 'Maximum' | 'Minimum';
                   minAdjustmentMagnitude?: number; //Should only be used with PercentChangeInCapacity
-                  scaleBy?: number; //defaults to 1
+                  scaleBy?: number; //defaults to -1
                   //
                   metricNamespace: string;
                   metricName: string;
@@ -91,6 +91,8 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
                   operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
                   targetValue: number;
                   targetArn: string;
+                  //
+                  metricDependsOn?: string | string[];
               };
               scaleOut?: {
                   adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
@@ -107,6 +109,8 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
                   operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
                   targetValue: number;
                   targetArn: string;
+                  //
+                  metricDependsOn?: string | string[];
               };
         }
         //Load balancer

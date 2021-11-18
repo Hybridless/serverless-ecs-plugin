@@ -135,43 +135,27 @@ export interface IServiceAutoScalingOptions {
     cooldownIn?: number; //defaults to cooldown but has priority over it
     cooldownOut?: number; //defaults to cooldown but has priority over it
     targetValue: number;
-    scaleIn?: {
-        adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
-        cooldown?: number; //default to 300
-        aggregation: 'Average' | 'Maximum' | 'Minimum';
-        minAdjustmentMagnitude?: number; //Should only be used with PercentChangeInCapacity
-        scaleBy?: number; //defaults to 1
-        //
-        metricNamespace: string;
-        metricName: string;
-        metricDimension: string;
-        metricPeriod?: number; //defaults to 120
-        metricEvaluationPeriod?: number; //defaults to 1
-        operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
-        targetValue: number;
-        targetArn: string;
-        //
-        metricDependsOn?: string | string[];
-    };
-    scaleOut?: {
-        adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
-        cooldown?: number; //default to 300
-        aggregation: 'Average' | 'Maximum' | 'Minimum';
-        minAdjustmentMagnitude?: number; //Should only be used with PercentChangeInCapacity
-        scaleBy?: number; //defaults to -1
-        //
-        metricNamespace: string;
-        metricName: string;
-        metricDimension: string;
-        metricPeriod?: number; //defaults to 120
-        metricEvaluationPeriod?: number; //defaults to 1
-        operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
-        targetValue: number;
-        targetArn: string;
-        //
-        metricDependsOn?: string | string[];
-    };
+    scaleIn?: IServiceBasicStepScalingPolicy;
+    scaleOut?: IServiceBasicStepScalingPolicy;
 }
+export interface IServiceBasicStepScalingPolicy {
+    adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
+    cooldown?: number; //default to 300
+    aggregation: 'Average' | 'Maximum' | 'Minimum';
+    minAdjustmentMagnitude?: number; //Should only be used with PercentChangeInCapacity
+    scaleBy?: number; //defaults to -1
+    //
+    metricNamespace: string;
+    metricName: string;
+    metricDimension: string;
+    metricPeriod?: number; //defaults to 120
+    metricEvaluationPeriod?: number; //defaults to 1
+    operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
+    targetValue: number;
+    targetArn: string;
+    //
+    metricDependsOn?: string | string[];
+};
 
 //Misc
 export enum PropagateTagsType {
