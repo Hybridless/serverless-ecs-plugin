@@ -62,36 +62,37 @@ export class Cluster extends Resource<IClusterOptions> {
     public getClusterIngressSecGroup(): any {
         return (this.isSharedCluster() ? this.options.clusterArns.ecsIngressSecGroupId : { "Ref": this.getName(NamePostFix.CONTAINER_SECURITY_GROUP) });
     }
+    public getClusterName(): any {
+        return (this.isSharedCluster() ? this.options.clusterArns.ecsClusterArn.split('/')[1] /* always 2nd obj??, not sure :/ */ : this.getName(NamePostFix.CLUSTER) )
+    }
 
     /* Private */
     private getClusterSecurityGroups(): any {
-        if (this.getVPC().useExistingVPC()) { return {}; } //No security group resource is required
-        else {
-            return {
-                [this.getName(NamePostFix.CONTAINER_SECURITY_GROUP)]: {
-                    "Type": "AWS::EC2::SecurityGroup",
-                    "DeletionPolicy": "Delete",
-                    "Properties": {
-                        ...(this.getTags() ? { "Tags": this.getTags() } : {}),
-                        "GroupDescription": "Access to the ECS containers",
-                        "VpcId": this.getVPC().getRefName()
-                    }
-                },
-                [this.getName(NamePostFix.SECURITY_GROUP_INGRESS_SELF)]: {
-                    "Type": "AWS::EC2::SecurityGroupIngress",
-                    "DeletionPolicy": "Delete",
-                    "Properties": {
-                        "Description": "Ingress from other containers in the same security group",
-                        "GroupId": {
-                            "Ref": this.getName(NamePostFix.CONTAINER_SECURITY_GROUP)
-                        },
-                        "IpProtocol": -1,
-                        "SourceSecurityGroupId": {
-                            "Ref": this.getName(NamePostFix.CONTAINER_SECURITY_GROUP)
-                        }
+        if (this.isSharedCluster()) return { };
+        return {
+            [this.getName(NamePostFix.CONTAINER_SECURITY_GROUP)]: {
+                "Type": "AWS::EC2::SecurityGroup",
+                "DeletionPolicy": "Delete",
+                "Properties": {
+                    ...(this.getTags() ? { "Tags": this.getTags() } : {}),
+                    "GroupDescription": "Access to the ECS containers",
+                    "VpcId": this.getVPC().getRefName()
+                }
+            },
+            [this.getName(NamePostFix.SECURITY_GROUP_INGRESS_SELF)]: {
+                "Type": "AWS::EC2::SecurityGroupIngress",
+                "DeletionPolicy": "Delete",
+                "Properties": {
+                    "Description": "Ingress from other containers in the same security group",
+                    "GroupId": {
+                        "Ref": this.getName(NamePostFix.CONTAINER_SECURITY_GROUP)
+                    },
+                    "IpProtocol": -1,
+                    "SourceSecurityGroupId": {
+                        "Ref": this.getName(NamePostFix.CONTAINER_SECURITY_GROUP)
                     }
                 }
-            };
+            }
         }
     }
 }
