@@ -101,6 +101,19 @@
                         "cooldown": {
                           "type": "number"
                         },
+                        "metricDependsOn": {
+                          "anyOf": [
+                            {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
                         "metricDimension": {
                           "type": "string"
                         },
@@ -173,6 +186,19 @@
                         },
                         "cooldown": {
                           "type": "number"
+                        },
+                        "metricDependsOn": {
+                          "anyOf": [
+                            {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
                         },
                         "metricDimension": {
                           "type": "string"
@@ -665,6 +691,19 @@
                         "cooldown": {
                           "type": "number"
                         },
+                        "metricDependsOn": {
+                          "anyOf": [
+                            {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
                         "metricDimension": {
                           "type": "string"
                         },
@@ -737,6 +776,19 @@
                         },
                         "cooldown": {
                           "type": "number"
+                        },
+                        "metricDependsOn": {
+                          "anyOf": [
+                            {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
                         },
                         "metricDimension": {
                           "type": "string"

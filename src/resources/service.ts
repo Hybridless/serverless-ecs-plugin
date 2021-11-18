@@ -357,7 +357,7 @@ export class Service extends Resource<IServiceOptions> {
                     }
                 }
             },
-            ...(this.options.autoScale?.scaleIn && this.options.autoScale?.scaleOut ? {
+            ...(!this.options.autoScale?.scaleIn && !this.options.autoScale?.scaleOut ? {
                 [this.getName(NamePostFix.AutoScalingPolicy)]: {
                     "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
                     "DeletionPolicy": "Delete",
@@ -404,6 +404,7 @@ export class Service extends Resource<IServiceOptions> {
                 [this.getName(NamePostFix.AutoScalingPolicyInAlarm)]: {
                     "Type": "AWS::CloudWatch::Alarm",
                     "DeletionPolicy": "Delete",
+                    ...(this.options.autoScale.scaleIn.metricDependsOn ? { "DependsOn": this.options.autoScale.scaleIn.metricDependsOn } : {}),
                     "Properties": {
                         "AlarmName": this.getName(NamePostFix.AutoScalingPolicyInAlarm),
                         "AlarmDescription": `Auto created scale in policy for ${this.getName(NamePostFix.TARGET_GROUP)}`,
@@ -448,6 +449,7 @@ export class Service extends Resource<IServiceOptions> {
                 [this.getName(NamePostFix.AutoScalingPolicyOutAlarm)]: {
                     "Type": "AWS::CloudWatch::Alarm",
                     "DeletionPolicy": "Delete",
+                    ...(this.options.autoScale.scaleOut.metricDependsOn ? { "DependsOn": this.options.autoScale.scaleOut.metricDependsOn } : {}),
                     "Properties": {
                         "AlarmName": this.getName(NamePostFix.AutoScalingPolicyOutAlarm),
                         "AlarmDescription": `Auto created scale out policy for ${this.getName(NamePostFix.TARGET_GROUP)}`,

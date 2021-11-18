@@ -135,7 +135,6 @@ export interface IServiceAutoScalingOptions {
     cooldownIn?: number; //defaults to cooldown but has priority over it
     cooldownOut?: number; //defaults to cooldown but has priority over it
     targetValue: number;
-    //Optional Custom metric
     scaleIn?: {
         adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
         cooldown?: number; //default to 300
@@ -151,6 +150,8 @@ export interface IServiceAutoScalingOptions {
         operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
         targetValue: number;
         targetArn: string;
+        //
+        metricDependsOn?: string | string[];
     };
     scaleOut?: {
         adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
@@ -167,6 +168,8 @@ export interface IServiceAutoScalingOptions {
         operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
         targetValue: number;
         targetArn: string;
+        //
+        metricDependsOn?: string | string[];
     };
 }
 
