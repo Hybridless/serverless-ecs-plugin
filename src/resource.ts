@@ -28,7 +28,11 @@ export enum NamePostFix {
     // Service auto scaling specific
     AutoScalingRole = "ASRole",
     AutoScalingTarget = "ASTarget", 
-    AutoScalingPolicy = "ASPolicy"
+    AutoScalingPolicy = "ASPolicy",
+    AutoScalingPolicyIn = "ASPolicyIn",
+    AutoScalingPolicyInAlarm = "AutoScalingPolicyInAlarm",
+    AutoScalingPolicyOut = "ASPolicyOut",
+    AutoScalingPolicyOutAlarm = "ASPolicyOutAlarm"
 }
 
 export abstract class Resource<T> {

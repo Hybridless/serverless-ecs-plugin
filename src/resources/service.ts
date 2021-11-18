@@ -357,25 +357,115 @@ export class Service extends Resource<IServiceOptions> {
                     }
                 }
             },
-            [this.getName(NamePostFix.AutoScalingPolicy)]: {
-                "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
-                "DeletionPolicy": "Delete",
-                "Properties": {
-                    "PolicyName": this.getName(NamePostFix.AutoScalingPolicy),
-                    "PolicyType": "TargetTrackingScaling",
-                    "ScalingTargetId": {
-                        "Ref": this.getName(NamePostFix.AutoScalingTarget)
-                    },
-                    "TargetTrackingScalingPolicyConfiguration": {
-                        "ScaleInCooldown": this.options.autoScale.cooldownIn || this.options.autoScale.cooldown || 30,
-                        "ScaleOutCooldown": this.options.autoScale.cooldownOut || this.options.autoScale.cooldown || 30,
-                        "TargetValue": this.options.autoScale.targetValue,
-                        "PredefinedMetricSpecification": {
-                            "PredefinedMetricType": this.options.autoScale.metric,
+            ...(this.options.autoScale?.scaleIn && this.options.autoScale?.scaleOut ? {
+                [this.getName(NamePostFix.AutoScalingPolicy)]: {
+                    "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+                    "DeletionPolicy": "Delete",
+                    "Properties": {
+                        "PolicyName": this.getName(NamePostFix.AutoScalingPolicy),
+                        "PolicyType": "TargetTrackingScaling",
+                        "ScalingTargetId": {
+                            "Ref": this.getName(NamePostFix.AutoScalingTarget)
+                        },
+                        "TargetTrackingScalingPolicyConfiguration": {
+                            "ScaleInCooldown": this.options.autoScale.cooldownIn || this.options.autoScale.cooldown || 30,
+                            "ScaleOutCooldown": this.options.autoScale.cooldownOut || this.options.autoScale.cooldown || 30,
+                            "TargetValue": this.options.autoScale.targetValue,
+                            "PredefinedMetricSpecification": {
+                                "PredefinedMetricType": this.options.autoScale.metric,
+                            }
                         }
                     }
                 }
-            }
+            } : {}),
+            ...(this.options.autoScale.scaleIn ? {
+                [this.getName(NamePostFix.AutoScalingPolicyIn)]: {
+                    "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+                    "DeletionPolicy": "Delete",
+                    "Properties": {
+                        "PolicyName": this.getName(NamePostFix.AutoScalingPolicyIn),
+                        "PolicyType": "StepScaling",
+                        "ScalingTargetId": {
+                            "Ref": this.getName(NamePostFix.AutoScalingTarget)
+                        },
+                        "StepScalingPolicyConfiguration": {
+                            "AdjustmentType": this.options.autoScale.scaleIn.adjustmentType || 'ChangeInCapacity',
+                            "Cooldown": this.options.autoScale.scaleIn.cooldown || 300,
+                            "MetricAggregationType": this.options.autoScale.scaleIn.aggregation,
+                            ...(this.options.autoScale.scaleIn.minAdjustmentMagnitude ? { "MinAdjustmentMagnitude": this.options.autoScale.scaleIn.minAdjustmentMagnitude } : {}),
+                            "StepAdjustments": {
+                                ...(this.options.autoScale.scaleIn.operator.toLowerCase().includes('lower') ? { "MetricIntervalLowerBound": this.options.autoScale.scaleIn.targetValue } : {}),
+                                ...(this.options.autoScale.scaleIn.operator.toLowerCase().includes('greater') ? { "MetricIntervalUpperBound": this.options.autoScale.scaleIn.targetValue } : {}),
+                                "ScalingAdjustment": this.options.autoScale.scaleIn.scaleBy || 1
+                            },
+                        }
+                    }
+                },
+                [this.getName(NamePostFix.AutoScalingPolicyInAlarm)]: {
+                    "Type": "AWS::CloudWatch::Alarm",
+                    "DeletionPolicy": "Delete",
+                    "Properties": {
+                        "AlarmName": this.getName(NamePostFix.AutoScalingPolicyInAlarm),
+                        "AlarmDescription": `Auto created scale in policy for ${this.getName(NamePostFix.TARGET_GROUP)}`,
+                        "Namespace": this.options.autoScale.scaleIn.metricNamespace,
+                        "MetricName": this.options.autoScale.scaleIn.metricName,
+                        "Statistic": this.options.autoScale.scaleIn.aggregation,
+                        "Period": this.options.autoScale.scaleIn.metricPeriod || 120,
+                        "EvaluationPeriods": this.options.autoScale.scaleIn.metricEvaluationPeriod || 1,
+                        "ComparisonOperator": this.options.autoScale.scaleIn.operator,
+                        "Threshold": this.options.autoScale.scaleIn.targetValue,
+                        "Dimensions": [{
+                            "Name": this.options.autoScale.scaleIn.metricDimension,
+                            "Value": this.options.autoScale.scaleIn.targetArn,
+                        }],
+                        "TreatMissingData": "notBreaching"
+                    }
+                }
+            } : {}),
+            ...(this.options.autoScale.scaleOut ? {
+                [this.getName(NamePostFix.AutoScalingPolicyOut)]: {
+                    "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+                    "DeletionPolicy": "Delete",
+                    "Properties": {
+                        "PolicyName": this.getName(NamePostFix.AutoScalingPolicyOut),
+                        "PolicyType": "StepScaling",
+                        "ScalingTargetId": {
+                            "Ref": this.getName(NamePostFix.AutoScalingTarget)
+                        },
+                        "StepScalingPolicyConfiguration": {
+                            "AdjustmentType": this.options.autoScale.scaleOut.adjustmentType || 'ChangeInCapacity',
+                            "Cooldown": this.options.autoScale.scaleOut.cooldown || 300,
+                            "MetricAggregationType": this.options.autoScale.scaleOut.aggregation,
+                            ...(this.options.autoScale.scaleOut.minAdjustmentMagnitude ? { "MinAdjustmentMagnitude": this.options.autoScale.scaleOut.minAdjustmentMagnitude } : {}),
+                            "StepAdjustments": {
+                                ...(this.options.autoScale.scaleOut.operator.toLowerCase().includes('lower') ? { "MetricIntervalLowerBound": this.options.autoScale.scaleOut.targetValue } : {}),
+                                ...(this.options.autoScale.scaleOut.operator.toLowerCase().includes('greater') ? { "MetricIntervalUpperBound": this.options.autoScale.scaleOut.targetValue } : {}),
+                                "ScalingAdjustment": this.options.autoScale.scaleOut.scaleBy || -1
+                            },
+                        }
+                    }
+                },
+                [this.getName(NamePostFix.AutoScalingPolicyOutAlarm)]: {
+                    "Type": "AWS::CloudWatch::Alarm",
+                    "DeletionPolicy": "Delete",
+                    "Properties": {
+                        "AlarmName": this.getName(NamePostFix.AutoScalingPolicyOutAlarm),
+                        "AlarmDescription": `Auto created scale out policy for ${this.getName(NamePostFix.TARGET_GROUP)}`,
+                        "Namespace": this.options.autoScale.scaleOut.metricNamespace,
+                        "MetricName": this.options.autoScale.scaleOut.metricName,
+                        "Statistic": this.options.autoScale.scaleOut.aggregation,
+                        "Period": this.options.autoScale.scaleOut.metricPeriod || 120,
+                        "EvaluationPeriods": this.options.autoScale.scaleOut.metricEvaluationPeriod || 1,
+                        "ComparisonOperator": this.options.autoScale.scaleOut.operator,
+                        "Threshold": this.options.autoScale.scaleOut.targetValue,
+                        "Dimensions": [{
+                            "Name": this.options.autoScale.scaleOut.metricDimension,
+                            "Value": this.options.autoScale.scaleOut.targetArn,
+                        }],
+                        "TreatMissingData": "notBreaching"
+                    }
+                }
+            } : {}),
         }
     }
 
