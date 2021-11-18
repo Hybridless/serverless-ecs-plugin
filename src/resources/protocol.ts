@@ -8,6 +8,7 @@ export class Protocol extends Resource<IServiceListener> {
     private readonly cluster: Cluster;
     private readonly service: Service;
     public readonly port: number;
+    public readonly containerPort: number;
 
     public constructor(cluster: Cluster,
                        service: Service,
