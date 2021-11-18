@@ -322,13 +322,35 @@ export class Service extends Resource<IServiceOptions> {
                                 "Effect": "Allow",
                                 "Action": "sts:AssumeRole",
                                 "Principal": {
-                                    "Service": "ecs-tasks.amazonaws.com",
+                                    "Service": [
+                                        "ecs-tasks.amazonaws.com",
+                                        "application-autoscaling.amazonaws.com"
+                                    ]
                                 }
                             }
                         ]
                     },
                     "ManagedPolicyArns": [
                         "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
+                    ],
+                    "Path": "/",
+                    "Policies": [ {
+                            "PolicyName": "service-autoscaling",
+                            "PolicyDocument": {
+                                "Statement": [ {
+                                        "Effect": "Allow",
+                                        "Action": [
+                                            "application-autoscaling:*",
+                                            "cloudwatch:DescribeAlarms",
+                                            "cloudwatch:PutMetricAlarm",
+                                            "ecs:DescribeServices",
+                                            "ecs:UpdateService"
+                                        ],
+                                        "Resource": "*"
+                                    }
+                                ]
+                            }
+                        } 
                     ]
                 }
             },
@@ -345,7 +367,7 @@ export class Service extends Resource<IServiceOptions> {
                             "/",
                             [
                                 "service", 
-                                this.cluster.getClusterRef(),
+                                this.cluster.getClusterName(),
                                 { "Fn::GetAtt": [ this.getName(NamePostFix.SERVICE), "Name" ] }
                             ]
                         ]
@@ -383,7 +405,7 @@ export class Service extends Resource<IServiceOptions> {
                     "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
                     "DeletionPolicy": "Delete",
                     "Properties": {
-                        "PolicyName": this.getName(NamePostFix.AutoScalingPolicyIn),
+                        "PolicyName": this.getName(NamePostFix.AutoScalingPolicyIn) + Date.now(),
                         "PolicyType": "StepScaling",
                         "ScalingTargetId": {
                             "Ref": this.getName(NamePostFix.AutoScalingTarget)
@@ -406,7 +428,7 @@ export class Service extends Resource<IServiceOptions> {
                     "DeletionPolicy": "Delete",
                     ...(this.options.autoScale.scaleIn.metricDependsOn ? { "DependsOn": this.options.autoScale.scaleIn.metricDependsOn } : {}),
                     ...(this.options.autoScale.scaleIn.metricDependsOn ? {
-                        "DependsOn": Array.isArray(this.options.autoScale.scaleIn.metricDependsOn) ? this.options.autoScale.scaleIn.metricDependsOn.concat([this.getName(NamePostFix.AutoScalingPolicyIn)]) : this.getName(NamePostFix.AutoScalingPolicyIn)
+                        "DependsOn": Array.isArray(this.options.autoScale.scaleIn.metricDependsOn) ? this.options.autoScale.scaleIn.metricDependsOn.concat([this.getName(NamePostFix.AutoScalingPolicyIn)]) : [this.getName(NamePostFix.AutoScalingPolicyIn), this.options.autoScale.scaleIn.metricDependsOn]
                     } : {
                         "DependsOn": this.getName(NamePostFix.AutoScalingPolicyIn)
                     }),
@@ -422,8 +444,8 @@ export class Service extends Resource<IServiceOptions> {
                         "Threshold": this.options.autoScale.scaleIn.targetValue,
                         "Dimensions": [{
                             "Name": this.options.autoScale.scaleIn.metricDimension,
-                            "Value": this.options.autoScale.scaleIn.targetArn,
-                        }],
+                            "Value": this.options.autoScale.scaleIn.metricDimensionTarget,
+                        }].concat((this.options.autoScale.scaleIn.additionalDimension || []).map((a) => ({ "Name": a.dimension, "Value": a.target }))),
                         "TreatMissingData": "notBreaching",
                         "AlarmActions": [{ "Ref": this.getName(NamePostFix.AutoScalingPolicyIn) }]
                     }
@@ -434,7 +456,7 @@ export class Service extends Resource<IServiceOptions> {
                     "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
                     "DeletionPolicy": "Delete",
                     "Properties": {
-                        "PolicyName": this.getName(NamePostFix.AutoScalingPolicyOut),
+                        "PolicyName": this.getName(NamePostFix.AutoScalingPolicyOut) + Date.now(),
                         "PolicyType": "StepScaling",
                         "ScalingTargetId": {
                             "Ref": this.getName(NamePostFix.AutoScalingTarget)
@@ -456,7 +478,7 @@ export class Service extends Resource<IServiceOptions> {
                     "Type": "AWS::CloudWatch::Alarm",
                     "DeletionPolicy": "Delete",
                     ...(this.options.autoScale.scaleOut.metricDependsOn ? { 
-                        "DependsOn": Array.isArray(this.options.autoScale.scaleOut.metricDependsOn) ? this.options.autoScale.scaleOut.metricDependsOn.concat([this.getName(NamePostFix.AutoScalingPolicyOut)]) : this.getName(NamePostFix.AutoScalingPolicyOut)
+                        "DependsOn": Array.isArray(this.options.autoScale.scaleOut.metricDependsOn) ? this.options.autoScale.scaleOut.metricDependsOn.concat([this.getName(NamePostFix.AutoScalingPolicyOut)]) : [this.getName(NamePostFix.AutoScalingPolicyOut), this.options.autoScale.scaleOut.metricDependsOn]
                     } : {
                         "DependsOn": this.getName(NamePostFix.AutoScalingPolicyOut)
                     }),
@@ -472,8 +494,8 @@ export class Service extends Resource<IServiceOptions> {
                         "Threshold": this.options.autoScale.scaleOut.targetValue,
                         "Dimensions": [{
                             "Name": this.options.autoScale.scaleOut.metricDimension,
-                            "Value": this.options.autoScale.scaleOut.targetArn,
-                        }],
+                            "Value": this.options.autoScale.scaleOut.metricDimensionTarget,
+                        }].concat((this.options.autoScale.scaleOut.additionalDimension || []).map((a) => ({ "Name": a.dimension, "Value": a.target }))),
                         "TreatMissingData": "notBreaching",
                         "AlarmActions": [{ "Ref": this.getName(NamePostFix.AutoScalingPolicyOut) }]
                     }

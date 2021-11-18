@@ -148,13 +148,14 @@ export interface IServiceBasicStepScalingPolicy {
     metricNamespace: string;
     metricName: string;
     metricDimension: string;
+    metricDimensionTarget: string;
     metricPeriod?: number; //defaults to 120
     metricEvaluationPeriod?: number; //defaults to 1
     operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
     targetValue: number;
-    targetArn: string;
-    //
+    //additional config
     metricDependsOn?: string | string[];
+    additionalDimension?: { dimension: string, target: string }[];
 };
 
 //Misc

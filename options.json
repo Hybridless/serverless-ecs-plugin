@@ -82,6 +82,25 @@
                     "scaleIn": {
                       "additionalProperties": false,
                       "properties": {
+                        "additionalDimension": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "dimension": {
+                                "type": "string"
+                              },
+                              "target": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "dimension",
+                              "target"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "adjustmentType": {
                           "enum": [
                             "ChangeInCapacity",
@@ -117,6 +136,9 @@
                         "metricDimension": {
                           "type": "string"
                         },
+                        "metricDimensionTarget": {
+                          "type": "string"
+                        },
                         "metricEvaluationPeriod": {
                           "type": "number"
                         },
@@ -147,9 +169,6 @@
                         "scaleBy": {
                           "type": "number"
                         },
-                        "targetArn": {
-                          "type": "string"
-                        },
                         "targetValue": {
                           "type": "number"
                         }
@@ -157,10 +176,10 @@
                       "required": [
                         "aggregation",
                         "metricDimension",
+                        "metricDimensionTarget",
                         "metricName",
                         "metricNamespace",
                         "operator",
-                        "targetArn",
                         "targetValue"
                       ],
                       "type": "object"
@@ -168,6 +187,25 @@
                     "scaleOut": {
                       "additionalProperties": false,
                       "properties": {
+                        "additionalDimension": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "dimension": {
+                                "type": "string"
+                              },
+                              "target": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "dimension",
+                              "target"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "adjustmentType": {
                           "enum": [
                             "ChangeInCapacity",
@@ -203,6 +241,9 @@
                         "metricDimension": {
                           "type": "string"
                         },
+                        "metricDimensionTarget": {
+                          "type": "string"
+                        },
                         "metricEvaluationPeriod": {
                           "type": "number"
                         },
@@ -233,9 +274,6 @@
                         "scaleBy": {
                           "type": "number"
                         },
-                        "targetArn": {
-                          "type": "string"
-                        },
                         "targetValue": {
                           "type": "number"
                         }
@@ -243,10 +281,10 @@
                       "required": [
                         "aggregation",
                         "metricDimension",
+                        "metricDimensionTarget",
                         "metricName",
                         "metricNamespace",
                         "operator",
-                        "targetArn",
                         "targetValue"
                       ],
                       "type": "object"
@@ -672,6 +710,25 @@
                     "scaleIn": {
                       "additionalProperties": false,
                       "properties": {
+                        "additionalDimension": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "dimension": {
+                                "type": "string"
+                              },
+                              "target": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "dimension",
+                              "target"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "adjustmentType": {
                           "enum": [
                             "ChangeInCapacity",
@@ -707,6 +764,9 @@
                         "metricDimension": {
                           "type": "string"
                         },
+                        "metricDimensionTarget": {
+                          "type": "string"
+                        },
                         "metricEvaluationPeriod": {
                           "type": "number"
                         },
@@ -737,9 +797,6 @@
                         "scaleBy": {
                           "type": "number"
                         },
-                        "targetArn": {
-                          "type": "string"
-                        },
                         "targetValue": {
                           "type": "number"
                         }
@@ -747,10 +804,10 @@
                       "required": [
                         "aggregation",
                         "metricDimension",
+                        "metricDimensionTarget",
                         "metricName",
                         "metricNamespace",
                         "operator",
-                        "targetArn",
                         "targetValue"
                       ],
                       "type": "object"
@@ -758,6 +815,25 @@
                     "scaleOut": {
                       "additionalProperties": false,
                       "properties": {
+                        "additionalDimension": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "dimension": {
+                                "type": "string"
+                              },
+                              "target": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "dimension",
+                              "target"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "adjustmentType": {
                           "enum": [
                             "ChangeInCapacity",
@@ -793,6 +869,9 @@
                         "metricDimension": {
                           "type": "string"
                         },
+                        "metricDimensionTarget": {
+                          "type": "string"
+                        },
                         "metricEvaluationPeriod": {
                           "type": "number"
                         },
@@ -823,9 +902,6 @@
                         "scaleBy": {
                           "type": "number"
                         },
-                        "targetArn": {
-                          "type": "string"
-                        },
                         "targetValue": {
                           "type": "number"
                         }
@@ -833,10 +909,10 @@
                       "required": [
                         "aggregation",
                         "metricDimension",
+                        "metricDimensionTarget",
                         "metricName",
                         "metricNamespace",
                         "operator",
-                        "targetArn",
                         "targetValue"
                       ],
                       "type": "object"
