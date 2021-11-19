@@ -416,9 +416,8 @@ export class Service extends Resource<IServiceOptions> {
                             "MetricAggregationType": this.options.autoScale.scaleIn.aggregation,
                             ...(this.options.autoScale.scaleIn.minAdjustmentMagnitude ? { "MinAdjustmentMagnitude": this.options.autoScale.scaleIn.minAdjustmentMagnitude } : {}),
                             "StepAdjustments": [{
-                                ...(this.options.autoScale.scaleIn.operator.toLowerCase().includes('greater') ? { "MetricIntervalLowerBound": this.options.autoScale.scaleIn.targetValue } : {}),
-                                ...(this.options.autoScale.scaleIn.operator.toLowerCase().includes('less') ? { "MetricIntervalUpperBound": this.options.autoScale.scaleIn.targetValue } : {}),
-                                "ScalingAdjustment": this.options.autoScale.scaleIn.scaleBy || 1
+                                "MetricIntervalLowerBound": 0,
+                                "ScalingAdjustment": this.options.autoScale.scaleIn.scaleBy || -1
                             }],
                         }
                     }
@@ -467,9 +466,8 @@ export class Service extends Resource<IServiceOptions> {
                             "MetricAggregationType": this.options.autoScale.scaleOut.aggregation,
                             ...(this.options.autoScale.scaleOut.minAdjustmentMagnitude ? { "MinAdjustmentMagnitude": this.options.autoScale.scaleOut.minAdjustmentMagnitude } : {}),
                             "StepAdjustments": [{
-                                ...(this.options.autoScale.scaleOut.operator.toLowerCase().includes('less') ? { "MetricIntervalLowerBound": this.options.autoScale.scaleOut.targetValue } : {}),
-                                ...(this.options.autoScale.scaleOut.operator.toLowerCase().includes('greater') ? { "MetricIntervalUpperBound": this.options.autoScale.scaleOut.targetValue } : {}),
-                                "ScalingAdjustment": this.options.autoScale.scaleOut.scaleBy || -1
+                                "MetricIntervalLowerBound": 0,
+                                "ScalingAdjustment": this.options.autoScale.scaleOut.scaleBy || 1
                             }],
                         }
                     }
