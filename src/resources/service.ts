@@ -446,7 +446,7 @@ export class Service extends Resource<IServiceOptions> {
                             "Name": this.options.autoScale.scaleIn.metricDimension,
                             "Value": this.options.autoScale.scaleIn.metricDimensionTarget,
                         }].concat((this.options.autoScale.scaleIn.additionalDimension || []).map((a) => ({ "Name": a.dimension, "Value": a.target }))),
-                        "TreatMissingData": "notBreaching",
+                        "TreatMissingData": "breaching", //since we want to scale in the absence of requests, we consider it breanching
                         "AlarmActions": [{ "Ref": this.getName(NamePostFix.AutoScalingPolicyIn) }]
                     }
                 }
