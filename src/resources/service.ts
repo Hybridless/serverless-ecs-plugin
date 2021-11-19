@@ -71,7 +71,7 @@ export class Service extends Resource<IServiceOptions> {
 
     private getSecurityGroups(): any {
         if (this.cluster.getVPC().useExistingVPC()) {
-            return this.cluster.getVPC().getSecurityGroups();  
+            return this.cluster.getVPC().getSecurityGroups().concat([this.cluster.getClusterIngressSecGroup()]);
         } return [ this.cluster.getClusterIngressSecGroup() ];
     }
 
@@ -416,7 +416,8 @@ export class Service extends Resource<IServiceOptions> {
                             "MetricAggregationType": this.options.autoScale.scaleIn.aggregation,
                             ...(this.options.autoScale.scaleIn.minAdjustmentMagnitude ? { "MinAdjustmentMagnitude": this.options.autoScale.scaleIn.minAdjustmentMagnitude } : {}),
                             "StepAdjustments": [{
-                                "MetricIntervalLowerBound": 0,
+                                ...(this.options.autoScale.scaleIn.operator.toLowerCase().includes('greater') ? { "MetricIntervalLowerBound": 0 } : {}),
+                                ...(this.options.autoScale.scaleIn.operator.toLowerCase().includes('less') ? { "MetricIntervalUpperBound": 0 } : {}),
                                 "ScalingAdjustment": this.options.autoScale.scaleIn.scaleBy || -1
                             }],
                         }
@@ -466,7 +467,8 @@ export class Service extends Resource<IServiceOptions> {
                             "MetricAggregationType": this.options.autoScale.scaleOut.aggregation,
                             ...(this.options.autoScale.scaleOut.minAdjustmentMagnitude ? { "MinAdjustmentMagnitude": this.options.autoScale.scaleOut.minAdjustmentMagnitude } : {}),
                             "StepAdjustments": [{
-                                "MetricIntervalLowerBound": 0,
+                                ...(this.options.autoScale.scaleOut.operator.toLowerCase().includes('greater') ? { "MetricIntervalLowerBound": 0 } : {}),
+                                ...(this.options.autoScale.scaleOut.operator.toLowerCase().includes('less') ? { "MetricIntervalUpperBound": 0 } : {}),
                                 "ScalingAdjustment": this.options.autoScale.scaleOut.scaleBy || 1
                             }],
                         }

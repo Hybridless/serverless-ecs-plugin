@@ -87,7 +87,7 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
                   metricName: string;
                   metricDimension: string;
                   metricPeriod?: number; //defaults to 120
-                  metricEvaluationPeriod?: number; //defaults to 1
+                  metricEvaluationPeriod?: number; //defaults to -1
                   operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
                   targetValue: number;
                   targetArn: string;
