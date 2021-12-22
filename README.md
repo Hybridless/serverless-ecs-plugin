@@ -77,40 +77,48 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
               targetValue: number;
               //Step based AS
               scaleIn?: {
+                  //scaling
                   adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
                   cooldown?: number; //default to 300
                   aggregation: 'Average' | 'Maximum' | 'Minimum';
                   minAdjustmentMagnitude?: number; //Should only be used with PercentChangeInCapacity
-                  scaleBy?: number; //defaults to -1
-                  //
+                  scaleBy?: number; //defaults to 1 or -1
+                  //scaling metric
                   metricNamespace: string;
                   metricName: string;
                   metricDimension: string;
-                  metricPeriod?: number; //defaults to 120
-                  metricEvaluationPeriod?: number; //defaults to -1
-                  operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
-                  targetValue: number;
-                  targetArn: string;
-                  //
-                  metricDependsOn?: string | string[];
-              };
-              scaleOut?: {
-                  adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
-                  cooldown?: number; //default to 300
-                  aggregation: 'Average' | 'Maximum' | 'Minimum';
-                  minAdjustmentMagnitude?: number; //Should only be used with PercentChangeInCapacity
-                  scaleBy?: number; //defaults to -1
-                  //
-                  metricNamespace: string;
-                  metricName: string;
-                  metricDimension: string;
+                  metricDimensionTarget: string;
                   metricPeriod?: number; //defaults to 120
                   metricEvaluationPeriod?: number; //defaults to 1
                   operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
                   targetValue: number;
-                  targetArn: string;
-                  //
+                  //additional config (scaling metric)
                   metricDependsOn?: string | string[];
+                  additionalDimension?: { dimension: string, target: string }[];
+                  treatMissingData?: ' breaching' | 'notBreaching' | 'ignore' | 'missing'; //defaults to notBreaching
+                  fillupMissingData?: boolean | number; //fillup value is used on absence of data. default to false, true uses '0', number can be specified instead if any other fillup values is needed.
+              };
+              scaleOut?: {
+                  //scaling
+                  adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
+                  cooldown?: number; //default to 300
+                  aggregation: 'Average' | 'Maximum' | 'Minimum';
+                  minAdjustmentMagnitude?: number; //Should only be used with PercentChangeInCapacity
+                  scaleBy?: number; //defaults to 1 or -1
+                  //scaling metric
+                  metricNamespace: string;
+                  metricName: string;
+                  metricDimension: string;
+                  metricDimensionTarget: string;
+                  metricPeriod?: number; //defaults to 120
+                  metricEvaluationPeriod?: number; //defaults to 1
+                  operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
+                  targetValue: number;
+                  //additional config (scaling metric)
+                  metricDependsOn?: string | string[];
+                  additionalDimension?: { dimension: string, target: string }[];
+                  treatMissingData?: ' breaching' | 'notBreaching' | 'ignore' | 'missing'; //defaults to notBreaching
+                  fillupMissingData?: boolean | number; //fillup value is used on absence of data. default to false, true uses '0', number can be specified instead if any other fillup values is needed.
               };
         }
         //Load balancer

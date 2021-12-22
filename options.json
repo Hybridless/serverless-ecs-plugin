@@ -120,6 +120,12 @@
                         "cooldown": {
                           "type": "number"
                         },
+                        "fillupMissingData": {
+                          "type": [
+                            "number",
+                            "boolean"
+                          ]
+                        },
                         "metricDependsOn": {
                           "anyOf": [
                             {
@@ -171,6 +177,15 @@
                         },
                         "targetValue": {
                           "type": "number"
+                        },
+                        "treatMissingData": {
+                          "enum": [
+                            " breaching",
+                            "ignore",
+                            "missing",
+                            "notBreaching"
+                          ],
+                          "type": "string"
                         }
                       },
                       "required": [
@@ -225,6 +240,12 @@
                         "cooldown": {
                           "type": "number"
                         },
+                        "fillupMissingData": {
+                          "type": [
+                            "number",
+                            "boolean"
+                          ]
+                        },
                         "metricDependsOn": {
                           "anyOf": [
                             {
@@ -276,6 +297,15 @@
                         },
                         "targetValue": {
                           "type": "number"
+                        },
+                        "treatMissingData": {
+                          "enum": [
+                            " breaching",
+                            "ignore",
+                            "missing",
+                            "notBreaching"
+                          ],
+                          "type": "string"
                         }
                       },
                       "required": [
@@ -748,6 +778,12 @@
                         "cooldown": {
                           "type": "number"
                         },
+                        "fillupMissingData": {
+                          "type": [
+                            "number",
+                            "boolean"
+                          ]
+                        },
                         "metricDependsOn": {
                           "anyOf": [
                             {
@@ -799,6 +835,15 @@
                         },
                         "targetValue": {
                           "type": "number"
+                        },
+                        "treatMissingData": {
+                          "enum": [
+                            " breaching",
+                            "ignore",
+                            "missing",
+                            "notBreaching"
+                          ],
+                          "type": "string"
                         }
                       },
                       "required": [
@@ -853,6 +898,12 @@
                         "cooldown": {
                           "type": "number"
                         },
+                        "fillupMissingData": {
+                          "type": [
+                            "number",
+                            "boolean"
+                          ]
+                        },
                         "metricDependsOn": {
                           "anyOf": [
                             {
@@ -904,6 +955,15 @@
                         },
                         "targetValue": {
                           "type": "number"
+                        },
+                        "treatMissingData": {
+                          "enum": [
+                            " breaching",
+                            "ignore",
+                            "missing",
+                            "notBreaching"
+                          ],
+                          "type": "string"
                         }
                       },
                       "required": [

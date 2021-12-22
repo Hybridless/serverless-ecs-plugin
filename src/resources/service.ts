@@ -1,4 +1,4 @@
-import { IServiceOptions, IServiceListener, PropagateTagsType, IServiceFargateOptions, IServiceEC2Options} from "../options";
+import { IServiceOptions, IServiceListener, PropagateTagsType, IServiceFargateOptions, IServiceEC2Options, IServiceBasicStepScalingPolicy} from "../options";
 import {Cluster} from "./cluster";
 import {NamePostFix, Resource} from "../resource";
 import {Protocol} from "./protocol";
@@ -244,7 +244,7 @@ export class Service extends Resource<IServiceOptions> {
                 "DeletionPolicy": "Delete",
                 "Properties": {
                     "LogGroupName": this.logGroupName,
-                    "RetentionInDays": 30
+                    "RetentionInDays": 30 * 12 //a year
                 }
             }
         };
@@ -400,108 +400,88 @@ export class Service extends Resource<IServiceOptions> {
                     }
                 }
             } : {}),
-            ...(this.options.autoScale.scaleIn ? {
-                [this.getName(NamePostFix.AutoScalingPolicyIn)]: {
-                    "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
-                    "DeletionPolicy": "Delete",
-                    "Properties": {
-                        "PolicyName": this.getName(NamePostFix.AutoScalingPolicyIn) + Date.now(),
-                        "PolicyType": "StepScaling",
-                        "ScalingTargetId": {
-                            "Ref": this.getName(NamePostFix.AutoScalingTarget)
-                        },
-                        "StepScalingPolicyConfiguration": {
-                            "AdjustmentType": this.options.autoScale.scaleIn.adjustmentType || 'ChangeInCapacity',
-                            "Cooldown": this.options.autoScale.scaleIn.cooldown || 300,
-                            "MetricAggregationType": this.options.autoScale.scaleIn.aggregation,
-                            ...(this.options.autoScale.scaleIn.minAdjustmentMagnitude ? { "MinAdjustmentMagnitude": this.options.autoScale.scaleIn.minAdjustmentMagnitude } : {}),
-                            "StepAdjustments": [{
-                                ...(this.options.autoScale.scaleIn.operator.toLowerCase().includes('greater') ? { "MetricIntervalLowerBound": 0 } : {}),
-                                ...(this.options.autoScale.scaleIn.operator.toLowerCase().includes('less') ? { "MetricIntervalUpperBound": 0 } : {}),
-                                "ScalingAdjustment": this.options.autoScale.scaleIn.scaleBy || -1
-                            }],
-                        }
-                    }
-                },
-                [this.getName(NamePostFix.AutoScalingPolicyInAlarm)]: {
-                    "Type": "AWS::CloudWatch::Alarm",
-                    "DeletionPolicy": "Delete",
-                    ...(this.options.autoScale.scaleIn.metricDependsOn ? { "DependsOn": this.options.autoScale.scaleIn.metricDependsOn } : {}),
-                    ...(this.options.autoScale.scaleIn.metricDependsOn ? {
-                        "DependsOn": Array.isArray(this.options.autoScale.scaleIn.metricDependsOn) ? this.options.autoScale.scaleIn.metricDependsOn.concat([this.getName(NamePostFix.AutoScalingPolicyIn)]) : [this.getName(NamePostFix.AutoScalingPolicyIn), this.options.autoScale.scaleIn.metricDependsOn]
-                    } : {
-                        "DependsOn": this.getName(NamePostFix.AutoScalingPolicyIn)
-                    }),
-                    "Properties": {
-                        "AlarmName": this.getName(NamePostFix.AutoScalingPolicyInAlarm),
-                        "AlarmDescription": `Auto created scale in policy for ${this.getName(NamePostFix.TARGET_GROUP)}`,
-                        "Namespace": this.options.autoScale.scaleIn.metricNamespace,
-                        "MetricName": this.options.autoScale.scaleIn.metricName,
-                        "Statistic": this.options.autoScale.scaleIn.aggregation,
-                        "Period": this.options.autoScale.scaleIn.metricPeriod || 120,
-                        "EvaluationPeriods": this.options.autoScale.scaleIn.metricEvaluationPeriod || 1,
-                        "ComparisonOperator": this.options.autoScale.scaleIn.operator,
-                        "Threshold": this.options.autoScale.scaleIn.targetValue,
-                        "Dimensions": [{
-                            "Name": this.options.autoScale.scaleIn.metricDimension,
-                            "Value": this.options.autoScale.scaleIn.metricDimensionTarget,
-                        }].concat((this.options.autoScale.scaleIn.additionalDimension || []).map((a) => ({ "Name": a.dimension, "Value": a.target }))),
-                        "TreatMissingData": "breaching", //since we want to scale in the absence of requests, we consider it breanching
-                        "AlarmActions": [{ "Ref": this.getName(NamePostFix.AutoScalingPolicyIn) }]
-                    }
-                }
-            } : {}),
-            ...(this.options.autoScale.scaleOut ? {
-                [this.getName(NamePostFix.AutoScalingPolicyOut)]: {
-                    "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
-                    "DeletionPolicy": "Delete",
-                    "Properties": {
-                        "PolicyName": this.getName(NamePostFix.AutoScalingPolicyOut) + Date.now(),
-                        "PolicyType": "StepScaling",
-                        "ScalingTargetId": {
-                            "Ref": this.getName(NamePostFix.AutoScalingTarget)
-                        },
-                        "StepScalingPolicyConfiguration": {
-                            "AdjustmentType": this.options.autoScale.scaleOut.adjustmentType || 'ChangeInCapacity',
-                            "Cooldown": this.options.autoScale.scaleOut.cooldown || 300,
-                            "MetricAggregationType": this.options.autoScale.scaleOut.aggregation,
-                            ...(this.options.autoScale.scaleOut.minAdjustmentMagnitude ? { "MinAdjustmentMagnitude": this.options.autoScale.scaleOut.minAdjustmentMagnitude } : {}),
-                            "StepAdjustments": [{
-                                ...(this.options.autoScale.scaleOut.operator.toLowerCase().includes('greater') ? { "MetricIntervalLowerBound": 0 } : {}),
-                                ...(this.options.autoScale.scaleOut.operator.toLowerCase().includes('less') ? { "MetricIntervalUpperBound": 0 } : {}),
-                                "ScalingAdjustment": this.options.autoScale.scaleOut.scaleBy || 1
-                            }],
-                        }
-                    }
-                },
-                [this.getName(NamePostFix.AutoScalingPolicyOutAlarm)]: {
-                    "Type": "AWS::CloudWatch::Alarm",
-                    "DeletionPolicy": "Delete",
-                    ...(this.options.autoScale.scaleOut.metricDependsOn ? { 
-                        "DependsOn": Array.isArray(this.options.autoScale.scaleOut.metricDependsOn) ? this.options.autoScale.scaleOut.metricDependsOn.concat([this.getName(NamePostFix.AutoScalingPolicyOut)]) : [this.getName(NamePostFix.AutoScalingPolicyOut), this.options.autoScale.scaleOut.metricDependsOn]
-                    } : {
-                        "DependsOn": this.getName(NamePostFix.AutoScalingPolicyOut)
-                    }),
-                    "Properties": {
-                        "AlarmName": this.getName(NamePostFix.AutoScalingPolicyOutAlarm),
-                        "AlarmDescription": `Auto created scale out policy for ${this.getName(NamePostFix.TARGET_GROUP)}`,
-                        "Namespace": this.options.autoScale.scaleOut.metricNamespace,
-                        "MetricName": this.options.autoScale.scaleOut.metricName,
-                        "Statistic": this.options.autoScale.scaleOut.aggregation,
-                        "Period": this.options.autoScale.scaleOut.metricPeriod || 120,
-                        "EvaluationPeriods": this.options.autoScale.scaleOut.metricEvaluationPeriod || 1,
-                        "ComparisonOperator": this.options.autoScale.scaleOut.operator,
-                        "Threshold": this.options.autoScale.scaleOut.targetValue,
-                        "Dimensions": [{
-                            "Name": this.options.autoScale.scaleOut.metricDimension,
-                            "Value": this.options.autoScale.scaleOut.metricDimensionTarget,
-                        }].concat((this.options.autoScale.scaleOut.additionalDimension || []).map((a) => ({ "Name": a.dimension, "Value": a.target }))),
-                        "TreatMissingData": "notBreaching",
-                        "AlarmActions": [{ "Ref": this.getName(NamePostFix.AutoScalingPolicyOut) }]
-                    }
-                }
-            } : {}),
+            ...this.generateScalingInOutPolicyAndAlarm(false, this.options.autoScale.scaleIn),
+            ...this.generateScalingInOutPolicyAndAlarm(true, this.options.autoScale.scaleOut)
         }
     }
-
+    private generateScalingInOutPolicyAndAlarm(isOut: boolean, config?: IServiceBasicStepScalingPolicy): any {
+        if (!config) return {};
+        const policyName: string = (isOut ? this.getName(NamePostFix.AutoScalingPolicyOut) : this.getName(NamePostFix.AutoScalingPolicyIn));
+        const alarmName: string = (isOut ? this.getName(NamePostFix.AutoScalingPolicyOutAlarm) : this.getName(NamePostFix.AutoScalingPolicyInAlarm));
+        return {
+            [policyName]: {
+                "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+                "DeletionPolicy": "Delete",
+                "Properties": {
+                    "PolicyName": policyName + Date.now(),
+                    "PolicyType": "StepScaling",
+                    "ScalingTargetId": {
+                        "Ref": this.getName(NamePostFix.AutoScalingTarget)
+                    },
+                    "StepScalingPolicyConfiguration": {
+                        "AdjustmentType": config.adjustmentType || 'ChangeInCapacity',
+                        "Cooldown": config.cooldown || 300,
+                        "MetricAggregationType": config.aggregation,
+                        ...(config.minAdjustmentMagnitude ? { "MinAdjustmentMagnitude": config.minAdjustmentMagnitude } : {}),
+                        "StepAdjustments": [{
+                            ...(config.operator.toLowerCase().includes(('greater')) ? { "MetricIntervalLowerBound": 0 } : {}),
+                            ...(config.operator.toLowerCase().includes('less') ? { "MetricIntervalUpperBound": 0 } : {}),
+                            "ScalingAdjustment": config.scaleBy || (isOut ? 1 : -1)
+                        }],
+                    }
+                }
+            },
+            [alarmName]: {
+                "Type": "AWS::CloudWatch::Alarm",
+                "DeletionPolicy": "Delete",
+                ...(config.metricDependsOn ? {
+                    "DependsOn": Array.isArray(config.metricDependsOn) ? config.metricDependsOn.concat([policyName]) : [policyName, config.metricDependsOn]
+                } : {
+                    "DependsOn": policyName
+                }),
+                "Properties": {
+                    "AlarmName": alarmName,
+                    "AlarmDescription": `Auto created scale ${(isOut ? 'out' : 'in')} policy for ${this.getName(NamePostFix.TARGET_GROUP)}`,
+                    "EvaluationPeriods": config.metricEvaluationPeriod || 1,
+                    "ComparisonOperator": config.operator,
+                    "Threshold": config.targetValue,
+                    "TreatMissingData": config.treatMissingData || "notBreaching",
+                    "AlarmActions": [{ "Ref": policyName }],
+                    //math expression based alarm when fillup missing
+                    ...(config.fillupMissingData != undefined ? {
+                        "Metrics": [{
+                            "Id": "m1",
+                            "ReturnData": false,
+                            "MetricStat": {
+                                "Metric": {
+                                    "Dimensions": [{
+                                        "Name": config.metricDimension,
+                                        "Value": config.metricDimensionTarget,
+                                    }].concat((config.additionalDimension || []).map((a) => ({ "Name": a.dimension, "Value": a.target }))),
+                                    "MetricName": config.metricName,
+                                    "Namespace": config.metricNamespace
+                                },
+                                "Period": config.metricPeriod || 120,
+                                "Stat": config.aggregation,
+                            }
+                        }, {
+                            "Expression": `FILL(m1, ${typeof config.fillupMissingData == 'number' ? config.fillupMissingData : 0})`,
+                            "Id": "e1",
+                            "Label": `Fillup value (absence of data, uses ${typeof config.fillupMissingData == 'number' ? config.fillupMissingData : 0} value`,
+                            "ReturnData": true
+                        }]
+                    } : {
+                        "MetricName": config.metricName,
+                        "Dimensions": [{
+                            "Name": config.metricDimension,
+                            "Value": config.metricDimensionTarget,
+                        }].concat((config.additionalDimension || []).map((a) => ({ "Name": a.dimension, "Value": a.target }))),
+                        "Period": config.metricPeriod || 120,
+                        "Namespace": config.metricNamespace,
+                        "Statistic": config.aggregation,
+                    })
+                }
+            }
+        }
+    }
 }

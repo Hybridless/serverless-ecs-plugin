@@ -139,12 +139,13 @@ export interface IServiceAutoScalingOptions {
     scaleOut?: IServiceBasicStepScalingPolicy;
 }
 export interface IServiceBasicStepScalingPolicy {
+    //scaling
     adjustmentType?: 'ChangeInCapacity' | 'ExactCapacity' | 'PercentChangeInCapacity'; //defaults to ChangeInCapacity
     cooldown?: number; //default to 300
     aggregation: 'Average' | 'Maximum' | 'Minimum';
     minAdjustmentMagnitude?: number; //Should only be used with PercentChangeInCapacity
     scaleBy?: number; //defaults to 1 or -1
-    //
+    //scaling metric
     metricNamespace: string;
     metricName: string;
     metricDimension: string;
@@ -153,9 +154,11 @@ export interface IServiceBasicStepScalingPolicy {
     metricEvaluationPeriod?: number; //defaults to 1
     operator: 'GreaterThanOrEqualToThreshold' | 'GreaterThanThreshold' | 'LessThanThreshold' | 'LessThanOrEqualToThreshold' | 'LessThanLowerOrGreaterThanUpperThreshold' | 'LessThanLowerThreshold' | 'GreaterThanUpperThreshold';
     targetValue: number;
-    //additional config
+    //additional config (scaling metric)
     metricDependsOn?: string | string[];
     additionalDimension?: { dimension: string, target: string }[];
+    treatMissingData?: ' breaching' | 'notBreaching' | 'ignore' | 'missing'; //defaults to notBreaching
+    fillupMissingData?: boolean | number; //fillup value is used on absence of data. default to false, true uses '0', number can be specified instead if any other fillup values is needed.
 };
 
 //Misc
