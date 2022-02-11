@@ -44,7 +44,7 @@ export type IServiceOptions = {
     healthCheckUnhealthyCount?: number; // defaults to 2
     //Logs
     logsMultilinePattern?: string; //regex pattern to match multiline logs (useful for js objects for example)
-    logsRetetionInDays?: number; //defaults to 365 days
+    logsRetentionInDays?: number; //defaults to 365 days
     //IAM
     taskRoleArn?: string | object;
     //concurrency and task configurations

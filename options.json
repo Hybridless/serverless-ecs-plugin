@@ -576,7 +576,7 @@
                 "logsMultilinePattern": {
                   "type": "string"
                 },
-                "logsRetetionInDays": {
+                "logsRetentionInDays": {
                   "type": "number"
                 },
                 "memory": {
@@ -1214,7 +1214,7 @@
                 "logsMultilinePattern": {
                   "type": "string"
                 },
-                "logsRetetionInDays": {
+                "logsRetentionInDays": {
                   "type": "number"
                 },
                 "memory": {
