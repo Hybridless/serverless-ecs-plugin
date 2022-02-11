@@ -244,7 +244,7 @@ export class Service extends Resource<IServiceOptions> {
                 "DeletionPolicy": "Delete",
                 "Properties": {
                     "LogGroupName": this.logGroupName,
-                    "RetentionInDays": 30 * 12 //a year
+                    "RetentionInDays": this.options.logsRetetionInDays || 365
                 }
             }
         };
