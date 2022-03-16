@@ -33,7 +33,11 @@ class ServerlessECSPlugin {
             // Cmds
             'serverless-ecs-plugin:compile:compile': () => BPromise.bind(this).then(this.compile), //0
             // Real hooks
-            'deploy:compileFunctions': () => {
+            'deploy:compileFunctions': () => { //sls v2
+                return BPromise.bind(this)
+                    .then(() => this.serverless.pluginManager.spawn('serverless-ecs-plugin:compile'))
+            },
+            'package:compileFunctions': () => { //sls v3
                 return BPromise.bind(this)
                     .then(() => this.serverless.pluginManager.spawn('serverless-ecs-plugin:compile'))
             }
