@@ -96,7 +96,7 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
                   metricDependsOn?: string | string[];
                   additionalDimension?: { dimension: string, target: string }[];
                   treatMissingData?: ' breaching' | 'notBreaching' | 'ignore' | 'missing'; //defaults to notBreaching
-                  fillupMissingData?: boolean | number; //fillup value is used on absence of data. default to false, true uses '0', number can be specified instead if any other fillup values is needed.
+                  fillupMissingData?: any; //fillup value is used on absence of data. default to false, true uses '0', number can be specified instead if any other fillup values is needed.
               };
               scaleOut?: {
                   //scaling
@@ -118,7 +118,7 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
                   metricDependsOn?: string | string[];
                   additionalDimension?: { dimension: string, target: string }[];
                   treatMissingData?: ' breaching' | 'notBreaching' | 'ignore' | 'missing'; //defaults to notBreaching
-                  fillupMissingData?: boolean | number; //fillup value is used on absence of data. default to false, true uses '0', number can be specified instead if any other fillup values is needed.
+                  fillupMissingData?: any; //fillup value is used on absence of data. default to false, true uses '0', number can be specified instead if any other fillup values is needed.
               };
         }
         //Load balancer

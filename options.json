@@ -120,12 +120,7 @@
                         "cooldown": {
                           "type": "number"
                         },
-                        "fillupMissingData": {
-                          "type": [
-                            "number",
-                            "boolean"
-                          ]
-                        },
+                        "fillupMissingData": {},
                         "metricDependsOn": {
                           "anyOf": [
                             {
@@ -240,12 +235,7 @@
                         "cooldown": {
                           "type": "number"
                         },
-                        "fillupMissingData": {
-                          "type": [
-                            "number",
-                            "boolean"
-                          ]
-                        },
+                        "fillupMissingData": {},
                         "metricDependsOn": {
                           "anyOf": [
                             {
@@ -781,12 +771,7 @@
                         "cooldown": {
                           "type": "number"
                         },
-                        "fillupMissingData": {
-                          "type": [
-                            "number",
-                            "boolean"
-                          ]
-                        },
+                        "fillupMissingData": {},
                         "metricDependsOn": {
                           "anyOf": [
                             {
@@ -901,12 +886,7 @@
                         "cooldown": {
                           "type": "number"
                         },
-                        "fillupMissingData": {
-                          "type": [
-                            "number",
-                            "boolean"
-                          ]
-                        },
+                        "fillupMissingData": {},
                         "metricDependsOn": {
                           "anyOf": [
                             {
