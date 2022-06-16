@@ -71,7 +71,12 @@ export class Service extends Resource<IServiceOptions> {
 
     private getSecurityGroups(): any {
         if (this.cluster.getVPC().useExistingVPC()) {
-            return this.cluster.getVPC().getSecurityGroups().concat([this.cluster.getClusterIngressSecGroup()]);
+            if (Array.isArray(this.cluster.getVPC().getSecurityGroups())) {
+                return this.cluster.getVPC().getSecurityGroups().concat([this.cluster.getClusterIngressSecGroup()]);
+            } else {
+                //expect manual ingress group join
+                return this.cluster.getVPC().getSecurityGroups();
+            }
         } return [ this.cluster.getClusterIngressSecGroup() ];
     }
 
@@ -103,7 +108,7 @@ export class Service extends Resource<IServiceOptions> {
                         "MaximumPercent": 200,
                         "MinimumHealthyPercent": 75
                     },
-                    "DesiredCount": (this.options.desiredCount ? this.options.desiredCount : 1),
+                    "DesiredCount": (this.options.desiredCount ? this.options.desiredCount : 0),
                     ...(!this.options.ec2LaunchType ? {"NetworkConfiguration": {
                         "AwsvpcConfiguration": {
                             "AssignPublicIp": ((this.options as IServiceFargateOptions).disablePublicIPAssign ? "DISABLED" : "ENABLED"),
