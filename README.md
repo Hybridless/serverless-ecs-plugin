@@ -176,7 +176,41 @@ If you would like to reference the VPC elsewhere (such as other clusters). The V
 
 
 #### Examples
-```TODO```
+
+- HTTP Service with public docker image ***(you might encounter throtlling limitations from docker api and shadowing it to a private docker repository is highly recommended (e.g.: ECS or Github registry))***
+
+    ```
+    service: MyService
+    plugins:
+      - '@hybridless/serverless-ecs-plugin'
+    provider:
+      name: aws
+      stage: ${env:stage, 'local'}
+      region: ${env:region, 'ca-central-1'}
+    ecs:
+      - timeout: 10
+        clusterName: Ghost
+        tags:
+          Test: 123
+        vpc: 
+          cidr: 10.0.0.0/16
+          subnets: 
+            - 10.0.0.0/24
+            - 10.0.1.0/24
+        services:
+          - name: ghost
+            cpu: 1024
+            memory: 2048
+            desiredCount: 1
+            environment:
+              NODE_ENV: development
+            path: "/"
+            image: ghost
+            listeners:
+              - albProtocol: HTTP
+                port: 80
+                containerPort: 2368
+    ```
 
 ####Outputs
   For the configuration above CF will have the reference `ECSTestClusterExampleNameServiceHTTP` to be used on your serverless template as `${cf:stackName.ECSTestClusterExampleNameServiceHTTP}`
