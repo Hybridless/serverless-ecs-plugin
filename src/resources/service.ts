@@ -159,6 +159,10 @@ export class Service extends Resource<IServiceOptions> {
                             "Name": this.getName(NamePostFix.CONTAINER_NAME),
                             "Cpu": this.options.cpu,
                             "Memory": this.options.memory,
+                            ...(this.options.softCPU ? {
+                                "Ulimits": [ { "SoftLimit": this.options.softCPU, "Name": "cpu" } ]
+                            } : {}),
+                            ...(this.options.softMemory ? { "MemoryReservation": this.options.softMemory } : {}),
                             "Image": this.options.image || `${this.options.imageRepository}:${this.options.name}-${this.options.imageTag}`,
                             ...(this.options.entryPoint ? { "EntryPoint": this.options.entryPoint } : {}),
                             ...(this.listeners.length > 0 ? {

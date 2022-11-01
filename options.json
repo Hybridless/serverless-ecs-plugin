@@ -669,6 +669,12 @@
                 "schedulerRate": {
                   "type": "string"
                 },
+                "softCPU": {
+                  "type": "number"
+                },
+                "softMemory": {
+                  "type": "number"
+                },
                 "taskRoleArn": {
                   "anyOf": [
                     {
@@ -1246,6 +1252,12 @@
                 "schedulerInput": {},
                 "schedulerRate": {
                   "type": "string"
+                },
+                "softCPU": {
+                  "type": "number"
+                },
+                "softMemory": {
+                  "type": "number"
                 },
                 "taskRoleArn": {
                   "anyOf": [
