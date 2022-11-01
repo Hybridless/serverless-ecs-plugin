@@ -52,6 +52,8 @@ export type IServiceOptions = {
     ec2LaunchType?: boolean; //defaults to false, if true will laucnh task into EC2
     cpu: number;
     memory: number;
+    softCPU?: number;
+    softMemory?: number;
     //docker images
     image?: string;
     entryPoint?: string[]; //custom container entry point
