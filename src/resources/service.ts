@@ -160,7 +160,7 @@ export class Service extends Resource<IServiceOptions> {
                             "Cpu": this.options.cpu,
                             "Memory": this.options.memory,
                             ...(this.options.softCPU ? {
-                                "Ulimits": [ { "SoftLimit": this.options.softCPU, "Name": "cpu" } ]
+                                "Ulimits": [ { "SoftLimit": this.options.softCPU, "Name": "cpu", "HardLimit": 0 } ]
                             } : {}),
                             ...(this.options.softMemory ? { "MemoryReservation": this.options.softMemory } : {}),
                             "Image": this.options.image || `${this.options.imageRepository}:${this.options.name}-${this.options.imageTag}`,
