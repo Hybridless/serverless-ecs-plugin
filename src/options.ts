@@ -69,7 +69,7 @@ export interface IServiceEC2Options {
     ec2LaunchType: true;
     daemonEc2Type?: boolean; //default to false, and only considered when ec2LaunchType is true
     placementConstraints?: { expression: string, type: 'distinctInstance' | 'memberOf' }[];
-    placementStrategies?: { field: 'string', type: 'binpack' | 'random' | 'spread' }[];
+    placementStrategies?: { field: string, type: 'binpack' | 'random' | 'spread' }[];
     capacityProviderStrategy?: { base: number, capacityProvider: string, weight: number }[];
 };
 export interface IServiceFargateOptions {

@@ -352,9 +352,7 @@
                   "type": "number"
                 },
                 "ec2LaunchType": {
-                  "enum": [
-                    true
-                  ],
+                  "const": true,
                   "type": "boolean"
                 },
                 "entryPoint": {
@@ -632,9 +630,6 @@
                     "additionalProperties": false,
                     "properties": {
                       "field": {
-                        "enum": [
-                          "string"
-                        ],
                         "type": "string"
                       },
                       "type": {
@@ -986,9 +981,7 @@
                   "type": "boolean"
                 },
                 "ec2LaunchType": {
-                  "enum": [
-                    false
-                  ],
+                  "const": false,
                   "type": "boolean"
                 },
                 "entryPoint": {
