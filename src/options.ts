@@ -28,6 +28,9 @@ export type IServiceOptions = {
     name: string;
     environment?: { [key: string]: (string | object )};
     propagateTags?: PropagateTagsType; //defaults to off
+    privileged?: boolean
+    volumes?: { name: string, source: string }[]
+    mountPoints?: {source: string, dest: string}[]
     //ASG
     autoScale?: IServiceAutoScalingOptions;
     //Load balancer

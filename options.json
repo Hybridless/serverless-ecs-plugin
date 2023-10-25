@@ -570,6 +570,25 @@
                 "memory": {
                   "type": "number"
                 },
+                "mountPoints": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "dest": {
+                        "type": "string"
+                      },
+                      "source": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "dest",
+                      "source"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
                 "name": {
                   "type": "string"
                 },
@@ -649,6 +668,9 @@
                   },
                   "type": "array"
                 },
+                "privileged": {
+                  "type": "boolean"
+                },
                 "propagateTags": {
                   "enum": [
                     "OFF",
@@ -681,6 +703,25 @@
                       "type": "string"
                     }
                   ]
+                },
+                "volumes": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "source": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "source"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
                 }
               },
               "required": [
@@ -1199,6 +1240,25 @@
                 "memory": {
                   "type": "number"
                 },
+                "mountPoints": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "dest": {
+                        "type": "string"
+                      },
+                      "source": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "dest",
+                      "source"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
                 "name": {
                   "type": "string"
                 },
@@ -1230,6 +1290,9 @@
                       "type": "string"
                     }
                   ]
+                },
+                "privileged": {
+                  "type": "boolean"
                 },
                 "propagateTags": {
                   "enum": [
@@ -1263,6 +1326,25 @@
                       "type": "string"
                     }
                   ]
+                },
+                "volumes": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "source": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "source"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
                 }
               },
               "required": [

@@ -154,6 +154,7 @@ export class Service extends Resource<IServiceOptions> {
                     "TaskRoleArn": this.options.taskRoleArn ? this.options.taskRoleArn : ({
                         "Ref": "AWS::NoValue"
                     }),
+                    ...(this.options.volumes ? { "Volumes": this.options.volumes.map((m) => ({ Name: m.name, Host: { SourcePath: m.source } })) } : {}),
                     "ContainerDefinitions": [
                         Object.assign({
                             "Name": this.getName(NamePostFix.CONTAINER_NAME),
@@ -165,6 +166,8 @@ export class Service extends Resource<IServiceOptions> {
                             ...(this.options.softMemory ? { "MemoryReservation": this.options.softMemory } : {}),
                             "Image": this.options.image || `${this.options.imageRepository}:${this.options.name}-${this.options.imageTag}`,
                             ...(this.options.entryPoint ? { "EntryPoint": this.options.entryPoint } : {}),
+                            ...(this.options.privileged ? { "Privileged": this.options.privileged } : {}),
+                            ...(this.options.mountPoints ? { "MountPoints": this.options.mountPoints.map((m) => ({ SourceVolume: m.source, ContainerPath: m.dest })) } : {}),
                             ...(this.listeners.length > 0 ? {
                                 "PortMappings": this.listeners.map((l) => ({ "ContainerPort": l.containerPort }))
                             } : {}),
