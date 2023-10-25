@@ -144,8 +144,8 @@ export class Service extends Resource<IServiceOptions> {
                 "Properties": {
                     ...(this.getTags() ? { "Tags": this.getTags() } : {}),
                     "Family": `${this.getName(NamePostFix.TASK_DEFINITION)}`,
-                    "Cpu": this.options.cpu,
-                    "Memory": this.options.memory,
+                    ...(this.options.cpu != -1 ? {"Cpu": this.options.cpu} : {}),
+                    ...(this.options.memory != -1 ? {"Memory": this.options.memory} : {}),
                     "NetworkMode": (this.options.ec2LaunchType ? 'bridge' : "awsvpc"),
                     "RequiresCompatibilities": [
                         (this.options.ec2LaunchType ? "EC2" : "FARGATE"),
@@ -158,10 +158,10 @@ export class Service extends Resource<IServiceOptions> {
                     "ContainerDefinitions": [
                         Object.assign({
                             "Name": this.getName(NamePostFix.CONTAINER_NAME),
-                            "Cpu": this.options.cpu,
-                            "Memory": this.options.memory,
-                            ...(this.options.softCPU ? {
-                                "Ulimits": [ { "SoftLimit": this.options.softCPU, "Name": "cpu", "HardLimit": -1 } ]
+                            ...(this.options.cpu != -1 ? {"Cpu": this.options.cpu} : {}),
+                            ...(this.options.memory != -1 ? {"Memory": this.options.memory} : {}),
+                            ...(this.options.softCPU || this.options.hardCPU ? {
+                                "Ulimits": [ { "SoftLimit": this.options.softCPU || -1, "Name": "cpu", "HardLimit": this.options.hardCPU || -1 } ]
                             } : {}),
                             ...(this.options.softMemory ? { "MemoryReservation": this.options.softMemory } : {}),
                             "Image": this.options.image || `${this.options.imageRepository}:${this.options.name}-${this.options.imageTag}`,

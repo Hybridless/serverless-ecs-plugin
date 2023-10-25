@@ -56,6 +56,7 @@ export type IServiceOptions = {
     cpu: number;
     memory: number;
     softCPU?: number;
+    hardCPU?: number;
     softMemory?: number;
     //docker images
     image?: string;

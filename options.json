@@ -376,6 +376,9 @@
                   },
                   "type": "object"
                 },
+                "hardCPU": {
+                  "type": "number"
+                },
                 "healthCheckHealthyCount": {
                   "type": "number"
                 },
@@ -1045,6 +1048,9 @@
                     ]
                   },
                   "type": "object"
+                },
+                "hardCPU": {
+                  "type": "number"
                 },
                 "healthCheckHealthyCount": {
                   "type": "number"
