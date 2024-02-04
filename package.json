@@ -1,6 +1,6 @@
 {
   "name": "@hybridless/serverless-ecs-plugin",
-  "version": "0.0.41",
+  "version": "0.0.43",
   "description": "ECS bridge for serverless framework.",
   "main": "index.js",
   "homepage": "https://github.com/hybridless/serverless-ecs-plugin",
@@ -18,6 +18,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^29.5.7",
     "json-schema-ref-parser": "^9.0.9",
     "typescript": "^5.2.2",
     "typescript-json-schema": "^0.60.0"

@@ -207,6 +207,9 @@ export class Service extends Resource<IServiceOptions> {
                     "HealthCheckProtocol": this.options.healthCheckProtocol || 'HTTP',
                     "HealthCheckTimeoutSeconds": this.options.healthCheckTimeout ? this.options.healthCheckTimeout : 5,
                     "HealthyThresholdCount": this.options.healthCheckHealthyCount ? this.options.healthCheckHealthyCount : 2,
+                    ...(this.options.healthCheckStatusCode ? {
+                        "Matcher": { "HttpCode": this.options.healthCheckStatusCode }
+                    } : {}),
                     "TargetType": (this.options.ec2LaunchType ? "instance" : "ip"),
                     // "Name": this.getName(NamePostFix.TARGET_GROUP), -- should not be set - allow replacement
                     "Port": listener.getOptions().containerPort || listener.getOptions().port,

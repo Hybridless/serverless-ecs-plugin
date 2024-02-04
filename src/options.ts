@@ -5,6 +5,7 @@ export type IPlugin = IClusterOptions[];
 export interface IClusterOptions {
     tags?: object;
     enableContainerInsights?: boolean; //default is respecting account settings
+    disabled?: boolean; //Will not deploy this and services if true
     //Load balancer
     albPrivate?: boolean; //default to false, and only considered when auto creating ALB
     albDisabled?: boolean;
@@ -45,6 +46,7 @@ export type IServiceOptions = {
     healthCheckTimeout?: number; // in seconds, defaults to 5 seconds
     healthCheckHealthyCount?: number; // defaults to 2
     healthCheckUnhealthyCount?: number; // defaults to 2
+    healthCheckStatusCode?: number; // optional custom status code for health check
     //Logs
     logsMultilinePattern?: string; //regex pattern to match multiline logs (useful for js objects for example)
     logsRetentionInDays?: number; //defaults to 365 days

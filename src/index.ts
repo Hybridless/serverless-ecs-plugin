@@ -60,7 +60,7 @@ class ServerlessECSPlugin {
         }
         //For each cluster
         for (let clusterOption of options) {
-            if (clusterOption && clusterOption.vpc) { //sanity check for empty objects
+            if (clusterOption && clusterOption.vpc && !clusterOption.disabled) { //sanity check for empty objects
                 //multiple self-created VPCs will be a problem here, TODO: solve this with cluster prefix on resouces
                 const vpc: VPC = new VPC(stage, clusterOption.vpc, clusterOption.tags);
                 const cluster: Cluster = new Cluster(stage, clusterOption, vpc, serviceName, clusterOption.tags);

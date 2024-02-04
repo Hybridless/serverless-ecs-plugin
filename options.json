@@ -30,6 +30,9 @@
       "clusterName": {
         "type": "string"
       },
+      "disabled": {
+        "type": "boolean"
+      },
       "enableContainerInsights": {
         "type": "boolean"
       },
@@ -387,6 +390,9 @@
                 },
                 "healthCheckProtocol": {
                   "type": "string"
+                },
+                "healthCheckStatusCode": {
+                  "type": "number"
                 },
                 "healthCheckTimeout": {
                   "type": "number"
@@ -1060,6 +1066,9 @@
                 },
                 "healthCheckProtocol": {
                   "type": "string"
+                },
+                "healthCheckStatusCode": {
+                  "type": "number"
                 },
                 "healthCheckTimeout": {
                   "type": "number"
