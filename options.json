@@ -351,6 +351,9 @@
                 "daemonEc2Type": {
                   "type": "boolean"
                 },
+                "deregistrationDelay": {
+                  "type": "number"
+                },
                 "desiredCount": {
                   "type": "number"
                 },
@@ -1022,6 +1025,9 @@
                   "type": "object"
                 },
                 "cpu": {
+                  "type": "number"
+                },
+                "deregistrationDelay": {
                   "type": "number"
                 },
                 "desiredCount": {

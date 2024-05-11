@@ -210,6 +210,10 @@ export class Service extends Resource<IServiceOptions> {
                     ...(this.options.healthCheckStatusCode ? {
                         "Matcher": { "HttpCode": this.options.healthCheckStatusCode }
                     } : {}),
+                    ...(this.options.deregistrationDelay ? { "TargetGroupAttributes": [{
+                        "Key": "deregistration_delay.timeout_seconds",
+                        "Value": this.options.deregistrationDelay
+                    }]} : {}),
                     "TargetType": (this.options.ec2LaunchType ? "instance" : "ip"),
                     // "Name": this.getName(NamePostFix.TARGET_GROUP), -- should not be set - allow replacement
                     "Port": listener.getOptions().containerPort || listener.getOptions().port,

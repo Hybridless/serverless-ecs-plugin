@@ -47,6 +47,7 @@ export type IServiceOptions = {
     healthCheckHealthyCount?: number; // defaults to 2
     healthCheckUnhealthyCount?: number; // defaults to 2
     healthCheckStatusCode?: number; // optional custom status code for health check
+    deregistrationDelay?: number; //optional target group deregistration delay, aws defaults to 300sec
     //Logs
     logsMultilinePattern?: string; //regex pattern to match multiline logs (useful for js objects for example)
     logsRetentionInDays?: number; //defaults to 365 days

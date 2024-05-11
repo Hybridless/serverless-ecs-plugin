@@ -49,7 +49,8 @@ class ServerlessECSPlugin {
     private compile(): void {
         const service: any = this.serverless.service;
         //compatible with old serverless, new serverless (3.x) and hybridless hook
-        const options: IClusterOptions[] = (this.serverless.pluginManager.serverlessConfigFile ? this.serverless.pluginManager.serverlessConfigFile.ecs : this.serverless.configurationInput.ecs) || this.serverless.service.ecs;
+        let options: IClusterOptions[] = (this.serverless.pluginManager.serverlessConfigFile ? this.serverless.pluginManager.serverlessConfigFile.ecs : this.serverless.configurationInput.ecs) || [];
+        if (this.serverless.service.ecs) options = options.concat(this.serverless.service.ecs)
         const stage: string = service.provider ? service.provider.stage : service.stage;
         const provider = this.serverless.getProvider(Globals.PluginDefaultProvider);
         const serviceName: string = provider.naming.getNormalizedFunctionName(service.service.replace(/-/g, ''));
